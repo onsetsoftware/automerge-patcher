@@ -1,12 +1,12 @@
-import { type Patch, Text } from "@automerge/automerge";
-import { pick, set } from "dot-object";
+import { type Doc, type Patch, Text } from "@automerge/automerge";
+import { getProperty, setProperty } from "dot-prop";
 import { isPlainObject } from "./helpers";
 
-export function patch(doc: any, patch: Patch) {
+export function patch<T>(doc: Doc<T>, patch: Patch) {
   if (patch.action === "splice") {
     const [index, ...path] = [...patch.path].reverse();
 
-    const value = pick(path.reverse().join("."), doc);
+    const value: any = getProperty(doc, path.reverse().join("."));
 
     value.insertAt(Number(index), ...patch.values);
 
@@ -16,7 +16,7 @@ export function patch(doc: any, patch: Patch) {
   if (patch.action === "del") {
     const [index, ...path] = [...patch.path].reverse();
 
-    const value = pick(path.reverse().join("."), doc);
+    const value: any = getProperty(doc, path.reverse().join("."));
 
     if (isPlainObject(value) && !(value instanceof Text)) {
       delete value[index];
@@ -29,12 +29,12 @@ export function patch(doc: any, patch: Patch) {
   }
 
   if (patch.action === "put") {
-    set(patch.path.join("."), patch.value, doc);
+    setProperty(doc, patch.path.join("."), patch.value);
     return;
   }
 
   if (patch.action === "inc") {
-    const value = pick(patch.path.join("."), doc);
+    const value: any = getProperty(doc, patch.path.join("."));
     value.increment(patch.value);
     return;
   }

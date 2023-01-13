@@ -1,5 +1,5 @@
-import { Patch, Text } from "@automerge/automerge";
-import { pick } from "dot-object";
+import { type Patch, Text } from "@automerge/automerge";
+import { getProperty } from "dot-prop";
 import { isPlainObject } from "./helpers";
 
 export const unpatch = <T extends Record<string, any>>(
@@ -17,7 +17,7 @@ export const unpatch = <T extends Record<string, any>>(
   if (patch.action === "del") {
     const [index, ...path] = [...patch.path].reverse();
 
-    const value = pick(path.reverse().join("."), doc) || doc;
+    const value = getProperty(doc, path.reverse().join(".")) || doc;
 
     if (isPlainObject(value)) {
       return {
@@ -41,7 +41,7 @@ export const unpatch = <T extends Record<string, any>>(
   }
 
   if (patch.action === "put") {
-    const value = pick(patch.path.join("."), doc);
+    const value = getProperty(doc, patch.path.join("."));
 
     if (value) {
       return {
