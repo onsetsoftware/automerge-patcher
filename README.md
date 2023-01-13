@@ -20,6 +20,7 @@ const doc2 = change(
   doc, 
   {
     patchCallback: (p, old) => {
+      // capture inverse of each patch for undo
       patch = unpatch(old, p);
     }
   }, 
@@ -32,6 +33,7 @@ console.log(patch); // {action: 'put', path: ['foo'], value: 'bar'}
 console.log(doc2.foo); // baz
 
 const doc3 = change(doc2, (doc) => {
+  // apply the patch to revert the change
   applyPatch(doc, patch);
 });
 

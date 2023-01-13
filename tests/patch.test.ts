@@ -1,5 +1,5 @@
-import { change, type Doc, from, Patch, } from "@automerge/automerge";
-import { patch as applyPatch, TempIncPatch, unpatch } from "../src"
+import { change, type Doc, from, Patch } from "@automerge/automerge";
+import { patch as applyPatch } from "../src";
 import { beforeEach, describe, expect, test } from "vitest";
 import { Document } from "./data";
 import { pick } from "dot-object";
@@ -10,44 +10,46 @@ describe("Applying Patches", () => {
     doc = from(Document);
   });
 
-  const tests: {name: string, patch: Patch | TempIncPatch, expected: any, path: string}[] = [
+  const tests: { name: string; patch: Patch; expected: any; path: string }[] = [
     {
       name: "splice text",
       patch: {
         action: "splice",
-        path: ["text", 0],
-        values: ["h"],
+        path: ["text", 6],
+        values: ["t", "h", "e", "r", "e", " "],
       },
       path: "text",
-      expected: "hhello world",
+      expected: "hello there world",
     },
     {
       name: "delete text",
       patch: {
         action: "del",
         path: ["text", 2],
+        length: 3,
       },
       path: "text",
-      expected: "helo world",
+      expected: "he world",
     },
     {
       name: "insert into array",
       patch: {
         action: "splice",
         path: ["array", 1],
-        values: ["there"],
+        values: ["there", "my"],
       },
       path: "array",
-      expected: ["hello", "there", "world"],
+      expected: ["hello", "there", "my", "world"],
     },
     {
       name: "delete array entry",
       patch: {
         action: "del",
-        path: ["array", 1],
+        path: ["array", 0],
+        length: 2,
       },
       path: "array",
-      expected: ["hello"],
+      expected: [],
     },
     {
       name: "replace value",
@@ -90,38 +92,17 @@ describe("Applying Patches", () => {
       path: "counter",
       expected: 5,
     },
-      
   ];
-  
+
   tests.forEach(({ name, patch, expected, path }) => {
     test(name, () => {
       const newDoc = change(doc, (doc) => {
         applyPatch(doc, patch);
       });
 
-      expect(JSON.parse(JSON.stringify(pick(path, newDoc) || null))).toEqual(expected);
+      expect(JSON.parse(JSON.stringify(pick(path, newDoc) || null))).toEqual(
+        expected
+      );
     });
-  });
-  
-  test('', () => {
-    const doc = from({foo: 'bar'});
-    
-    let patch;
-    
-    const doc2 = change(doc, {
-      patchCallback: (p, old) => {
-        patch = unpatch(old, p);
-      }
-    }, (doc) => {
-      doc.foo = 'baz';
-    });
-
-    expect(doc2.foo).toBe('baz');
-    
-    const doc3 = change(doc2, (doc) => {
-      applyPatch(doc, patch);
-    });
-    
-    expect(doc3.foo).toBe('bar');
   });
 });

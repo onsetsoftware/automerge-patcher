@@ -1,12 +1,11 @@
 import { Patch, Text } from "@automerge/automerge";
 import { pick } from "dot-object";
-import { isPlainObject } from "is-plain-object";
-import { TempIncPatch } from "./index";
+import { isPlainObject } from "./helpers";
 
 export const unpatch = <T extends Record<string, any>>(
   doc: T,
-  patch: Patch | TempIncPatch
-):  Patch | TempIncPatch => {
+  patch: Patch
+): Patch => {
   if (patch.action === "splice") {
     return {
       action: "del",
@@ -19,7 +18,7 @@ export const unpatch = <T extends Record<string, any>>(
     const [index, ...path] = [...patch.path].reverse();
 
     const value = pick(path.reverse().join("."), doc) || doc;
-    
+
     if (isPlainObject(value)) {
       return {
         action: "put",
@@ -30,7 +29,7 @@ export const unpatch = <T extends Record<string, any>>(
     }
 
     const length = patch.length || 1;
-    
+
     return {
       action: "splice",
       path: patch.path,
@@ -58,7 +57,7 @@ export const unpatch = <T extends Record<string, any>>(
       };
     }
   }
-  
+
   if (patch.action === "inc") {
     return {
       action: "inc",

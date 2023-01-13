@@ -1,12 +1,12 @@
 import { beforeEach, describe, expect, test } from "vitest";
 import type { Patch } from "@automerge/automerge";
 import { Document } from "./data";
-import { TempIncPatch, unpatch } from "../src";
+import { unpatch } from "../src";
 
 describe("Un-patching patches", () => {
   beforeEach(() => {});
 
-  const tests: {name: string, patch: Patch | TempIncPatch, expected: Patch | TempIncPatch}[] = [
+  const tests: { name: string; patch: Patch; expected: Patch }[] = [
     {
       name: "basic text splice",
       patch: {
@@ -22,13 +22,13 @@ describe("Un-patching patches", () => {
       patch: {
         action: "del",
         path: ["text", 0],
-        length: 2
+        length: 2,
       },
       expected: {
         action: "splice",
         path: ["text", 0],
         values: ["h", "e"],
-      }
+      },
     },
 
     {
@@ -36,13 +36,13 @@ describe("Un-patching patches", () => {
       patch: {
         action: "del",
         path: ["array", 0],
-        length: 2
+        length: 2,
       },
       expected: {
         action: "splice",
         path: ["array", 0],
         values: ["hello", "world"],
-      }
+      },
     },
 
     {
@@ -56,7 +56,7 @@ describe("Un-patching patches", () => {
         action: "del",
         path: ["array", 1],
         length: 2,
-      }
+      },
     },
 
     {
@@ -72,7 +72,7 @@ describe("Un-patching patches", () => {
         path: ["string"],
         value: "hello world",
         conflict: false,
-      }
+      },
     },
 
     {
@@ -84,10 +84,10 @@ describe("Un-patching patches", () => {
         conflict: false,
       },
 
-      expected:{
+      expected: {
         action: "del",
         path: ["object", "new-string"],
-      }
+      },
     },
 
     {
@@ -96,12 +96,12 @@ describe("Un-patching patches", () => {
         action: "del",
         path: ["object", "hello"],
       },
-      expected:{
+      expected: {
         action: "put",
         path: ["object", "hello"],
         value: "world",
         conflict: false,
-      }
+      },
     },
 
     {
@@ -115,7 +115,7 @@ describe("Un-patching patches", () => {
         path: ["people", "entities", "id-1"],
         value: Document.people.entities["id-1"] as any,
         conflict: false,
-      }
+      },
     },
     {
       name: "increment counter",
@@ -128,7 +128,7 @@ describe("Un-patching patches", () => {
         action: "inc",
         path: ["counter"],
         value: -1,
-      }
+      },
     },
     {
       name: "decrement counter",
@@ -141,11 +141,11 @@ describe("Un-patching patches", () => {
         action: "inc",
         path: ["counter"],
         value: 5,
-      }
-    }
+      },
+    },
   ];
-  
-  tests.forEach(({name, patch, expected}) => {
+
+  tests.forEach(({ name, patch, expected }) => {
     test(name, () => {
       const unPatched = unpatch(Document, patch);
       expect(unPatched).toEqual(expected);
