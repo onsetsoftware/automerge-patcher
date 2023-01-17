@@ -8,9 +8,9 @@ describe("Un-patching patches", () => {
 
   const tests: { name: string; patch: Patch; expected: Patch }[] = [
     {
-      name: "basic text splice",
+      name: "basic text insert",
       patch: {
-        action: "splice",
+        action: "insert",
         path: ["text", 0],
         values: ["h", "e", "l", "l", "o"],
       },
@@ -25,7 +25,7 @@ describe("Un-patching patches", () => {
         length: 2,
       },
       expected: {
-        action: "splice",
+        action: "insert",
         path: ["text", 0],
         values: ["h", "e"],
       },
@@ -39,16 +39,16 @@ describe("Un-patching patches", () => {
         length: 2,
       },
       expected: {
-        action: "splice",
+        action: "insert",
         path: ["array", 0],
         values: ["hello", "world"],
       },
     },
 
     {
-      name: "array splice",
+      name: "array insert",
       patch: {
-        action: "splice",
+        action: "insert",
         path: ["array", 1],
         values: ["there", "again"],
       },
@@ -87,6 +87,23 @@ describe("Un-patching patches", () => {
       expected: {
         action: "del",
         path: ["object", "new-string"],
+      },
+    },
+
+    {
+      name: "put value where value is empty string",
+      patch: {
+        action: "put",
+        path: ["object", "empty"],
+        value: "this is new",
+        conflict: false,
+      },
+
+      expected: {
+        action: "put",
+        path: ["object", "empty"],
+        value: "",
+        conflict: false,
       },
     },
 
@@ -141,6 +158,32 @@ describe("Un-patching patches", () => {
         action: "inc",
         path: ["counter"],
         value: 5,
+      },
+    },
+    {
+      name: "splice string",
+      patch: {
+        action: "splice",
+        path: ["string", 0],
+        value: "hello",
+      },
+      expected: {
+        action: "del",
+        path: ["string", 0],
+        length: 5,
+      },
+    },
+    {
+      name: "delete string",
+      patch: {
+        action: "del",
+        path: ["string", 0],
+        length: 5,
+      },
+      expected: {
+        action: "splice",
+        path: ["string", 0],
+        value: "hello",
       },
     },
   ];

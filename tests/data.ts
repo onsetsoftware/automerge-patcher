@@ -8,16 +8,17 @@ export const Document: {
   object: {
     hello: string;
     data?: string;
-  },
+    empty?: string;
+  };
   people: {
     ids: string[];
     entities: {
       [id: string]: {
         name: string;
         id: string;
-      }
-    }
-  }
+      };
+    };
+  };
 } = {
   string: "hello world",
   text: new Text("hello world"),
@@ -25,6 +26,7 @@ export const Document: {
   array: ["hello", "world"],
   object: {
     hello: "world",
+    empty: "",
   },
   people: {
     ids: ["id-1", "id-2"],
@@ -36,7 +38,7 @@ export const Document: {
       "id-2": {
         id: "id-2",
         name: "John",
-      }
-    }
-  }
-}
+      },
+    },
+  },
+};

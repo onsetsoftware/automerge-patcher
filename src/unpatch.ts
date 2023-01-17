@@ -1,12 +1,13 @@
 import { type Patch, Text } from "@automerge/automerge";
 import { getProperty } from "dot-prop";
-import { isPlainObject } from "./helpers";
+import { isTextObject } from "./helpers";
+import { InsertPatch } from "./index";
 
-export const unpatch = <T extends Record<string, any>>(
+export const unpatch = <T extends Record<string, {}>>(
   doc: T,
-  patch: Patch
-): Patch => {
-  if (patch.action === "splice") {
+  patch: Patch | InsertPatch
+): Patch | InsertPatch => {
+  if (patch.action === "insert") {
     return {
       action: "del",
       path: patch.path,
@@ -17,9 +18,26 @@ export const unpatch = <T extends Record<string, any>>(
   if (patch.action === "del") {
     const [index, ...path] = [...patch.path].reverse();
 
-    const value = getProperty(doc, path.reverse().join(".")) || doc;
+    const value = getProperty(doc, path.reverse().join("."), doc) as
+      | Record<string | number, any>
+      | T
+      | Text
+      | Array<any>
+      | string;
 
-    if (isPlainObject(value)) {
+    if (typeof value === "string") {
+      return {
+        action: "splice",
+        path: patch.path,
+        value: [...Array(patch.length)]
+          .map((_, i) => value[Number(index) + i])
+          .join(""),
+      } as unknown as Patch;
+
+      // TODO: remove `as Patch` when types are updated
+    }
+
+    if (!Array.isArray(value) && !isTextObject(value)) {
       return {
         action: "put",
         path: patch.path,
@@ -31,19 +49,18 @@ export const unpatch = <T extends Record<string, any>>(
     const length = patch.length || 1;
 
     return {
-      action: "splice",
+      action: "insert",
       path: patch.path,
-      values:
-        value instanceof Text
-          ? [...Array(length)].map((_, i) => value.get(Number(index) + i))
-          : [...Array(length)].map((_, i) => value[Number(index) + i]),
+      values: isTextObject(value)
+        ? [...Array(length)].map((_, i) => value.get(Number(index) + i))
+        : [...Array(length)].map((_, i) => value[Number(index) + i]),
     };
   }
 
   if (patch.action === "put") {
     const value = getProperty(doc, patch.path.join("."));
 
-    if (value) {
+    if (value !== undefined) {
       return {
         action: "put",
         path: patch.path,
@@ -63,6 +80,15 @@ export const unpatch = <T extends Record<string, any>>(
       action: "inc",
       path: patch.path,
       value: -patch.value,
+    };
+  }
+
+  if (patch.action === "splice") {
+    return {
+      action: "del",
+      path: patch.path,
+      // TODO: remove `as any` when types are updated
+      length: (patch as any).value.length,
     };
   }
 

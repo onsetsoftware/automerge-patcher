@@ -1,11 +1,25 @@
-import { isPlainObject as baseIsPlainObject } from "is-plain-object";
-import { Text, Counter } from "@automerge/automerge";
+import { Text } from "@automerge/automerge";
 
-export function isPlainObject(arg: any): boolean {
+function baseIsPlainObject(arg: any): arg is Record<string, any> {
+  if (arg == null || typeof arg !== "object") {
+    return false;
+  }
+  const proto = Object.getPrototypeOf(arg);
+  if (proto == null) {
+    return true;
+  }
+  return proto === Object.prototype;
+}
+
+export function isPlainObject(arg: any): arg is Record<string, any> {
   return (
     baseIsPlainObject(arg) &&
-    !(arg instanceof Text) &&
+    !isTextObject(arg) &&
     !(arg instanceof Date) &&
-    !(arg instanceof Counter)
+    !Array.isArray(arg)
   );
+}
+
+export function isTextObject(arg: any): arg is Text {
+  return arg instanceof Text;
 }

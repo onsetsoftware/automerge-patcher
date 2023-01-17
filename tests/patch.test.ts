@@ -2,7 +2,7 @@ import { change, type Doc, from, Patch } from "@automerge/automerge";
 import { patch as applyPatch } from "../src";
 import { beforeEach, describe, expect, test } from "vitest";
 import { Document } from "./data";
-import { pick } from "dot-object";
+import { getProperty } from "dot-prop";
 
 describe("Applying Patches", () => {
   let doc: Doc<typeof Document>;
@@ -12,9 +12,9 @@ describe("Applying Patches", () => {
 
   const tests: { name: string; patch: Patch; expected: any; path: string }[] = [
     {
-      name: "splice text",
+      name: "insert text",
       patch: {
-        action: "splice",
+        action: "insert",
         path: ["text", 6],
         values: ["t", "h", "e", "r", "e", " "],
       },
@@ -34,7 +34,7 @@ describe("Applying Patches", () => {
     {
       name: "insert into array",
       patch: {
-        action: "splice",
+        action: "insert",
         path: ["array", 1],
         values: ["there", "my"],
       },
@@ -100,9 +100,9 @@ describe("Applying Patches", () => {
         applyPatch(doc, patch);
       });
 
-      expect(JSON.parse(JSON.stringify(pick(path, newDoc) || null))).toEqual(
-        expected
-      );
+      expect(
+        JSON.parse(JSON.stringify(getProperty(newDoc, path) || null))
+      ).toEqual(expected);
     });
   });
 });
