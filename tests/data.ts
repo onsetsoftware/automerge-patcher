@@ -1,6 +1,6 @@
 import { Counter, Text } from "@automerge/automerge";
 
-export const Document: {
+export const documentData: {
   string: string;
   text: Text;
   counter: Counter;

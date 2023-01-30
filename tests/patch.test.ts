@@ -1,16 +1,23 @@
-import { change, type Doc, from, Patch } from "@automerge/automerge";
+import { change, type Doc, from, Patch, unstable } from "@automerge/automerge";
 import { patch as applyPatch } from "../src";
 import { beforeEach, describe, expect, test } from "vitest";
-import { Document } from "./data";
+import { documentData } from "./data";
 import { getProperty } from "dot-prop";
 
 describe("Applying Patches", () => {
-  let doc: Doc<typeof Document>;
+  let doc: Doc<typeof documentData>;
+  let unstableDoc: Doc<typeof documentData>;
   beforeEach(() => {
-    doc = from(Document);
+    doc = from(documentData);
+    unstableDoc = unstable.from({ ...documentData });
   });
 
-  const tests: { name: string; patch: Patch; expected: any; path: string }[] = [
+  const stableTests: {
+    name: string;
+    patch: Patch;
+    expected: any;
+    path: string;
+  }[] = [
     {
       name: "insert text",
       patch: {
@@ -31,6 +38,9 @@ describe("Applying Patches", () => {
       path: "text",
       expected: "he world",
     },
+  ];
+
+  const tests: { name: string; patch: Patch; expected: any; path: string }[] = [
     {
       name: "insert into array",
       patch: {
@@ -94,9 +104,49 @@ describe("Applying Patches", () => {
     },
   ];
 
-  tests.forEach(({ name, patch, expected, path }) => {
+  const unstableTests: {
+    name: string;
+    patch: Patch;
+    expected: any;
+    path: string;
+  }[] = [
+    {
+      name: "insert text",
+      patch: {
+        action: "splice",
+        path: ["object", "hello", 5],
+        value: " there",
+      },
+      path: "object.hello",
+      expected: "world there",
+    },
+    {
+      name: "delete text",
+      patch: {
+        action: "del",
+        path: ["object", "hello", 1],
+        length: 2,
+      },
+      path: "object.hello",
+      expected: "wld",
+    },
+  ];
+
+  [...stableTests, ...tests].forEach(({ name, patch, expected, path }) => {
     test(name, () => {
       const newDoc = change(doc, (doc) => {
+        applyPatch(doc, patch);
+      });
+
+      expect(
+        JSON.parse(JSON.stringify(getProperty(newDoc, path) || null))
+      ).toEqual(expected);
+    });
+  });
+
+  [...tests, ...unstableTests].forEach(({ name, patch, expected, path }) => {
+    test(name, () => {
+      const newDoc = unstable.change(unstableDoc, (doc) => {
         applyPatch(doc, patch);
       });
 

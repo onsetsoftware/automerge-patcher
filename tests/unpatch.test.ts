@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, test } from "vitest";
 import type { Patch } from "@automerge/automerge";
-import { Document } from "./data";
+import { documentData } from "./data";
 import { unpatch } from "../src";
 
 describe("Un-patching patches", () => {
@@ -130,7 +130,7 @@ describe("Un-patching patches", () => {
       expected: {
         action: "put",
         path: ["people", "entities", "id-1"],
-        value: Document.people.entities["id-1"] as any,
+        value: documentData.people.entities["id-1"] as any,
         conflict: false,
       },
     },
@@ -190,7 +190,7 @@ describe("Un-patching patches", () => {
 
   tests.forEach(({ name, patch, expected }) => {
     test(name, () => {
-      const unPatched = unpatch(Document, patch);
+      const unPatched = unpatch(documentData, patch);
       expect(unPatched).toEqual(expected);
     });
   });
