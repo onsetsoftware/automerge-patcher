@@ -1,12 +1,11 @@
 import { type Patch, Text } from "@automerge/automerge";
 import { getProperty } from "dot-prop";
 import { isTextObject } from "./helpers";
-import { InsertPatch } from "./index";
 
 export const unpatch = <T extends Record<string, {}>>(
   doc: T,
-  patch: Patch | InsertPatch
-): Patch | InsertPatch => {
+  patch: Patch
+): Patch => {
   if (patch.action === "insert") {
     return {
       action: "del",

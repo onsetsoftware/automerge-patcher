@@ -1,9 +1,8 @@
 import { type Doc, type Patch, unstable } from "@automerge/automerge";
 import { getProperty, setProperty } from "dot-prop";
 import { isPlainObject } from "./helpers";
-import { InsertPatch } from "./index";
 
-export function patch<T>(doc: Doc<T>, patch: Patch | InsertPatch) {
+export function patch<T>(doc: Doc<T>, patch: Patch) {
   if (patch.action === "insert") {
     const [index, ...path] = [...patch.path].reverse();
 

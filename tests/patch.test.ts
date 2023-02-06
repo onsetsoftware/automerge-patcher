@@ -6,10 +6,11 @@ import { getProperty } from "dot-prop";
 
 describe("Applying Patches", () => {
   let doc: Doc<typeof documentData>;
-  let unstableDoc: Doc<typeof documentData>;
+  let unstableDoc: Doc<Omit<typeof documentData, "text">>;
   beforeEach(() => {
     doc = from(documentData);
-    unstableDoc = unstable.from({ ...documentData });
+    const { text, ...withoutText } = documentData;
+    unstableDoc = unstable.from({ ...withoutText });
   });
 
   const stableTests: {
