@@ -1,12 +1,21 @@
-import { type Doc, type Patch, unstable } from "@automerge/automerge";
+import {
+  type Doc,
+  type Extend,
+  List,
+  type Patch,
+  Text,
+  unstable,
+} from "@automerge/automerge";
 import { getProperty, setProperty } from "dot-prop";
 import { isPlainObject } from "./helpers";
 
-export function patch<T>(doc: Doc<T>, patch: Patch) {
+export function patch<T>(doc: Extend<T>, patch: Patch) {
   if (patch.action === "insert") {
     const [index, ...path] = [...patch.path].reverse();
 
-    const value: any = getProperty(doc, path.reverse().join("."));
+    const value = getProperty(doc, path.reverse().join(".")) as
+      | Text
+      | List<any>;
 
     value.insertAt(Number(index), ...patch.values);
 
@@ -19,7 +28,12 @@ export function patch<T>(doc: Doc<T>, patch: Patch) {
     const value: any = getProperty(doc, path.reverse().join("."));
 
     if (typeof value === "string") {
-      unstable.splice(doc, path.join("/"), index as number, patch.length || 1);
+      unstable.splice(
+        doc as Doc<T>,
+        path.join("/"),
+        index as number,
+        patch.length || 1
+      );
 
       return;
     }
@@ -34,7 +48,7 @@ export function patch<T>(doc: Doc<T>, patch: Patch) {
   }
 
   if (patch.action === "put") {
-    setProperty(doc, patch.path.join("."), patch.value);
+    setProperty(doc as Doc<T>, patch.path.join("."), patch.value);
     return;
   }
 
@@ -46,7 +60,7 @@ export function patch<T>(doc: Doc<T>, patch: Patch) {
 
   if (patch.action === "splice") {
     unstable.splice(
-      doc,
+      doc as Doc<T>,
       patch.path.slice(0, -1).join("/"),
       patch.path.at(-1) as number,
       0,

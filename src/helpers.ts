@@ -1,4 +1,4 @@
-import { Text } from "@automerge/automerge";
+import { Prop, Text } from "@automerge/automerge";
 
 function baseIsPlainObject(arg: any): arg is Record<string, any> {
   if (arg == null || typeof arg !== "object") {
@@ -11,7 +11,7 @@ function baseIsPlainObject(arg: any): arg is Record<string, any> {
   return proto === Object.prototype;
 }
 
-export function isPlainObject(arg: any): arg is Record<string, any> {
+export function isPlainObject(arg: any): arg is Record<Prop, any> {
   return (
     baseIsPlainObject(arg) &&
     !isTextObject(arg) &&

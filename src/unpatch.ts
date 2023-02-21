@@ -31,9 +31,7 @@ export const unpatch = <T extends Record<string, {}>>(
         value: [...Array(patch.length)]
           .map((_, i) => value[Number(index) + i])
           .join(""),
-      } as unknown as Patch;
-
-      // TODO: remove `as Patch` when types are updated
+      };
     }
 
     if (!Array.isArray(value) && !isTextObject(value)) {
@@ -86,8 +84,7 @@ export const unpatch = <T extends Record<string, {}>>(
     return {
       action: "del",
       path: patch.path,
-      // TODO: remove `as any` when types are updated
-      length: (patch as any).value.length,
+      length: patch.value.length,
     };
   }
 
