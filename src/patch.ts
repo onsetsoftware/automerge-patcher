@@ -6,16 +6,33 @@ import {
   Text,
   unstable,
 } from "@automerge/automerge";
-import { getProperty, setProperty } from "dot-prop";
+import { getProperty, setProperty } from "./helpers";
 import { isPlainObject } from "./helpers";
 
-export function patch<T>(doc: Extend<T>, patch: Patch) {
+export function patch<T extends Record<string, any>>(
+  doc: Extend<T>,
+  patch: Patch,
+) {
   if (patch.action === "insert") {
     const [index, ...path] = [...patch.path].reverse();
 
     const value = getProperty(doc, path.reverse().join(".")) as
+      | string
       | Text
       | List<any>;
+
+    if (typeof value === "string") {
+      setProperty(
+        doc,
+        path.reverse().join("."),
+        new Text(
+          value.slice(0, Number(index)) +
+            patch.values.join("") +
+            value.slice(Number(index)),
+        ),
+      );
+      return;
+    }
 
     value.insertAt(Number(index), ...patch.values);
 
@@ -32,7 +49,7 @@ export function patch<T>(doc: Extend<T>, patch: Patch) {
         doc as Doc<T>,
         path.join("/"),
         index as number,
-        patch.length || 1
+        patch.length || 1,
       );
 
       return;
@@ -48,7 +65,7 @@ export function patch<T>(doc: Extend<T>, patch: Patch) {
   }
 
   if (patch.action === "put") {
-    setProperty(doc as Doc<T>, patch.path.join("."), patch.value);
+    setProperty(doc, patch.path.join("."), patch.value);
     return;
   }
 
@@ -64,7 +81,7 @@ export function patch<T>(doc: Extend<T>, patch: Patch) {
       patch.path.slice(0, -1).join("/"),
       patch.path.at(-1) as number,
       0,
-      patch.value
+      patch.value,
     );
 
     return;

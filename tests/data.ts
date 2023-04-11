@@ -10,6 +10,8 @@ export const documentData: {
     data?: string;
     empty?: string;
   };
+  emptyText: Text;
+  emptyString: string;
   people: {
     ids: string[];
     entities: {
@@ -28,6 +30,9 @@ export const documentData: {
     hello: "world",
     empty: "",
   },
+  emptyText: "" as unknown as Text, // this is the state which is created
+  // when a text is created with an empty string patch
+  emptyString: "",
   people: {
     ids: ["id-1", "id-2"],
     entities: {

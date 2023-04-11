@@ -2,7 +2,7 @@ import { change, type Doc, from, Patch, unstable } from "@automerge/automerge";
 import { patch as applyPatch } from "../src";
 import { beforeEach, describe, expect, test } from "vitest";
 import { documentData } from "./data";
-import { getProperty } from "dot-prop";
+import { getProperty } from "../src/helpers";
 
 describe("Applying Patches", () => {
   let doc: Doc<typeof documentData>;
@@ -38,6 +38,16 @@ describe("Applying Patches", () => {
       },
       path: "text",
       expected: "he world",
+    },
+    {
+      name: "insert text",
+      patch: {
+        action: "insert",
+        path: ["emptyText", 0],
+        values: ["h", "e", "l", "l", "o"],
+      },
+      path: "emptyText",
+      expected: "hello",
     },
   ];
 
@@ -140,7 +150,7 @@ describe("Applying Patches", () => {
       });
 
       expect(
-        JSON.parse(JSON.stringify(getProperty(newDoc, path) || null))
+        JSON.parse(JSON.stringify(getProperty(newDoc, path) || null)),
       ).toEqual(expected);
     });
   });
@@ -152,8 +162,23 @@ describe("Applying Patches", () => {
       });
 
       expect(
-        JSON.parse(JSON.stringify(getProperty(newDoc, path) || null))
+        JSON.parse(JSON.stringify(getProperty(newDoc, path) || null)),
       ).toEqual(expected);
     });
+  });
+
+  test("splicing an empty string works within the same function", () => {
+    const doc = unstable.init<{ foo: string }>();
+
+    const newDoc = unstable.change(doc, (doc) => {
+      doc.foo = "";
+      applyPatch(doc, {
+        action: "splice",
+        path: ["foo", 0],
+        value: "hello",
+      });
+    });
+
+    expect(newDoc.foo).toEqual("hello");
   });
 });

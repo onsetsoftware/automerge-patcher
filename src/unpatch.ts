@@ -1,10 +1,11 @@
-import { type Patch, Text } from "@automerge/automerge";
-import { getProperty } from "dot-prop";
+import type { Counter, Patch, Prop, Text } from "@automerge/automerge";
+import type { ObjType } from "@automerge/automerge-wasm";
+import { getProperty } from "./helpers";
 import { isTextObject } from "./helpers";
 
-export const unpatch = <T extends Record<string, {}>>(
+export const unpatch = <T extends Record<Prop, ObjType | Text | Counter>>(
   doc: T,
-  patch: Patch
+  patch: Patch,
 ): Patch => {
   if (patch.action === "insert") {
     return {
