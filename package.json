@@ -31,9 +31,10 @@
   "main": "./dist/automerge-patcher.umd.js",
   "module": "./dist/automerge-patcher.es.js",
   "exports": {
-     ".": {
-      "import": {"types": "./dist/types/index.d.ts",  "default": "./dist/automerge-patcher.es.js" },
-      "require": {"types": "./dist/types/index.d.ts",  "default": "./dist/automerge-patcher.umd.js"}
+    ".": {
+      "import": "./dist/automerge-patcher.es.js",
+      "require": "./dist/automerge-patcher.umd.js",
+      "types": "./dist/types/index.d.ts"
     }
   },
   "types": "./dist/types/index.d.ts",
