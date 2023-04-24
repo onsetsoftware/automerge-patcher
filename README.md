@@ -17,13 +17,13 @@ const doc = from({foo: 'bar'});
 let patch;
 
 const doc2 = change(
-  doc, 
+  doc,
   {
     patchCallback: (p, old) => {
       // capture inverse of each patch for undo
       patch = unpatch(old, p);
     }
-  }, 
+  },
   (doc) => {
     doc.foo = 'baz';
   }
@@ -41,4 +41,3 @@ console.log(doc3.foo); // bar
 
 
 ```
-
