@@ -1,25 +1,25 @@
 import {
-  type Doc,
-  type Extend,
-  List,
-  type Patch,
   Text,
+  insertAt,
   unstable,
+  type Doc,
+  type Patch,
 } from "@automerge/automerge";
-import { getProperty, setProperty } from "./helpers";
-import { isPlainObject } from "./helpers";
+import {
+  getProperty,
+  isPlainObject,
+  isTextObject,
+  setProperty,
+} from "./helpers";
 
-export function patch<T extends Record<string, any>>(
-  doc: Extend<T>,
-  patch: Patch,
-) {
+export function patch<T extends Record<string, any>>(doc: T, patch: Patch) {
   if (patch.action === "insert") {
     const [index, ...path] = [...patch.path].reverse();
 
     const value = getProperty(doc, path.reverse().join(".")) as
       | string
       | Text
-      | List<any>;
+      | any[];
 
     if (typeof value === "string") {
       setProperty(
@@ -34,7 +34,12 @@ export function patch<T extends Record<string, any>>(
       return;
     }
 
-    value.insertAt(Number(index), ...patch.values);
+    if (isTextObject(value)) {
+      value.insertAt(Number(index), ...patch.values);
+      return;
+    }
+
+    insertAt(value, Number(index), ...patch.values);
 
     return;
   }
@@ -45,12 +50,7 @@ export function patch<T extends Record<string, any>>(
     const value: any = getProperty(doc, path.reverse().join("."));
 
     if (typeof value === "string") {
-      unstable.splice(
-        doc as Doc<T>,
-        path.join("/"),
-        index as number,
-        patch.length || 1,
-      );
+      unstable.splice(doc as Doc<T>, path, index as number, patch.length || 1);
 
       return;
     }
@@ -78,7 +78,7 @@ export function patch<T extends Record<string, any>>(
   if (patch.action === "splice") {
     unstable.splice(
       doc as Doc<T>,
-      patch.path.slice(0, -1).join("/"),
+      patch.path.slice(0, -1),
       patch.path.at(-1) as number,
       0,
       patch.value,

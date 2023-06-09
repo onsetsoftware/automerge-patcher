@@ -1,5 +1,5 @@
-import { Doc, Extend, Prop, Text } from "@automerge/automerge";
-import { getByPath, setByPath } from "dot-path-value";
+import { Doc, Prop, Text } from "@automerge/automerge";
+import { Path, getByPath, setByPath } from "dot-path-value";
 
 function baseIsPlainObject(arg: any): arg is Record<string, any> {
   if (arg == null || typeof arg !== "object") {
@@ -25,18 +25,14 @@ export function isTextObject(arg: any): arg is Text {
   return arg instanceof Text;
 }
 
-export function getProperty<T>(
-  doc: Extend<T> | Doc<T>,
+export function getProperty<T extends Doc<T>>(
+  doc: T,
   path: string,
   defaultValue?: any,
 ): any {
-  return getByPath(doc as Record<string, any>, path) ?? defaultValue;
+  return getByPath(doc, path as Path<T>) ?? defaultValue;
 }
 
-export function setProperty<T>(
-  doc: Extend<T> | Doc<T>,
-  path: string,
-  value: any,
-): T {
+export function setProperty<T>(doc: T | Doc<T>, path: string, value: any): T {
   return setByPath(doc as Record<string, any>, path, value) as T;
 }
