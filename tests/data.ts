@@ -21,6 +21,19 @@ export const documentData: {
       };
     };
   };
+  deeply: {
+    nested: {
+      object: {
+        with: {
+          a: {
+            long: {
+              path: string[];
+            };
+          };
+        };
+      };
+    };
+  };
 } = {
   string: "hello world",
   text: new Text("hello world"),
@@ -46,4 +59,21 @@ export const documentData: {
       },
     },
   },
+  deeply: {
+    nested: {
+      object: {
+        with: {
+          a: {
+            long: {
+              path: ["hello", "world"],
+            },
+          },
+        },
+      },
+    },
+  },
 };
+
+const { text, ...withoutText } = documentData;
+
+export const documentDataWithoutText = withoutText;

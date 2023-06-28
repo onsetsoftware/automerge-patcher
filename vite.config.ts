@@ -1,8 +1,8 @@
 import { defineConfig } from "vite";
 import path from "path";
 import dts from "vite-plugin-dts";
-import wasm from "vite-plugin-wasm"
-import topLevelAwait from "vite-plugin-top-level-await"
+import wasm from "vite-plugin-wasm";
+import topLevelAwait from "vite-plugin-top-level-await";
 import { externalizeDeps } from "vite-plugin-externalize-deps";
 
 const resolvePath = (str: string) => path.resolve(__dirname, str);
@@ -27,8 +27,6 @@ export default defineConfig({
     }),
   ],
   optimizeDeps: {
-    exclude: [
-      "@automerge/automerge-wasm",
-    ]
-  }
+    exclude: ["@automerge/automerge-wasm"],
+  },
 });
