@@ -14,7 +14,7 @@ export default defineConfig({
     lib: {
       entry: resolvePath("src/index.ts"),
       name: "AutomergePatcher",
-      fileName: (format) => `automerge-patcher.${format}.js`,
+      fileName: `automerge-patcher`,
     },
   },
   plugins: [
@@ -23,7 +23,7 @@ export default defineConfig({
     wasm(),
     dts({
       entryRoot: resolvePath("src"),
-      outputDir: resolvePath("dist/types"),
+      outDir: resolvePath("dist/types"),
     }),
   ],
   optimizeDeps: {
