@@ -1,11 +1,7 @@
-import type { Counter, Patch, Prop, Text } from "@automerge/automerge";
-import type { ObjType } from "@automerge/automerge-wasm";
+import type { Doc, Patch, Prop, Text } from "@automerge/automerge";
 import { clone, getProperty, isTextObject } from "./helpers";
 
-export const unpatch = <T extends Record<Prop, ObjType | Text | Counter>>(
-  doc: T,
-  patch: Patch
-): Patch => {
+export const unpatch = <T>(doc: Doc<T>, patch: Patch): Patch => {
   if (patch.action === "insert") {
     return {
       action: "del",
@@ -18,8 +14,7 @@ export const unpatch = <T extends Record<Prop, ObjType | Text | Counter>>(
     const [index, ...path] = [...patch.path].reverse();
 
     const value = getProperty(doc, path.reverse().join("."), doc) as
-      | Record<string | number, any>
-      | T
+      | Record<Prop, any>
       | Text
       | Array<any>
       | string;
