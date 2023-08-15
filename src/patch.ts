@@ -12,7 +12,7 @@ import {
   setProperty,
 } from "./helpers";
 
-export function patch<T extends Record<string, any>>(doc: T, patch: Patch) {
+export function patch<T>(doc: Doc<T>, patch: Patch) {
   if (patch.action === "insert") {
     const [index, ...path] = [...patch.path].reverse();
 
@@ -50,7 +50,7 @@ export function patch<T extends Record<string, any>>(doc: T, patch: Patch) {
     const value: any = getProperty(doc, path.reverse().join("."));
 
     if (typeof value === "string") {
-      next.splice(doc as Doc<T>, path, index as number, patch.length || 1);
+      next.splice(doc, path, index as number, patch.length || 1);
 
       return;
     }
@@ -77,7 +77,7 @@ export function patch<T extends Record<string, any>>(doc: T, patch: Patch) {
 
   if (patch.action === "splice") {
     next.splice(
-      doc as Doc<T>,
+      doc,
       patch.path.slice(0, -1),
       patch.path.at(-1) as number,
       0,

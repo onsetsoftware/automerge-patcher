@@ -83,5 +83,5 @@ export const unpatch = <T>(doc: Doc<T>, patch: Patch): Patch => {
     };
   }
 
-  throw new Error(`Unknown patch action: ${(patch as any).action}`);
+  throw new Error(`Unknown patch action: ${patch.action}`);
 };
