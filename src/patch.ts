@@ -1,7 +1,7 @@
 import {
   Text,
   insertAt,
-  unstable,
+  next,
   type Doc,
   type Patch,
 } from "@automerge/automerge";
@@ -27,9 +27,9 @@ export function patch<T extends Record<string, any>>(doc: T, patch: Patch) {
         path.reverse().join("."),
         new Text(
           value.slice(0, Number(index)) +
-            patch.values.join("") +
-            value.slice(Number(index)),
-        ),
+          patch.values.join("") +
+          value.slice(Number(index))
+        )
       );
       return;
     }
@@ -50,7 +50,7 @@ export function patch<T extends Record<string, any>>(doc: T, patch: Patch) {
     const value: any = getProperty(doc, path.reverse().join("."));
 
     if (typeof value === "string") {
-      unstable.splice(doc as Doc<T>, path, index as number, patch.length || 1);
+      next.splice(doc as Doc<T>, path, index as number, patch.length || 1);
 
       return;
     }
@@ -76,12 +76,12 @@ export function patch<T extends Record<string, any>>(doc: T, patch: Patch) {
   }
 
   if (patch.action === "splice") {
-    unstable.splice(
+    next.splice(
       doc as Doc<T>,
       patch.path.slice(0, -1),
       patch.path.at(-1) as number,
       0,
-      patch.value,
+      patch.value
     );
 
     return;

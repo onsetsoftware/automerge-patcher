@@ -21,6 +21,10 @@ export function isPlainObject(arg: any): arg is Record<Prop, any> {
   );
 }
 
+export function clone<T>(arg: T): T {
+  return JSON.parse(JSON.stringify(arg));
+}
+
 export function isTextObject(arg: any): arg is Text {
   return arg instanceof Text;
 }
@@ -28,7 +32,7 @@ export function isTextObject(arg: any): arg is Text {
 export function getProperty<T extends Doc<T>>(
   doc: T,
   path: string,
-  defaultValue?: any,
+  defaultValue?: any
 ): any {
   return getByPath(doc, path as Path<T>) ?? defaultValue;
 }

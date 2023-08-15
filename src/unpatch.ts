@@ -1,10 +1,10 @@
 import type { Counter, Patch, Prop, Text } from "@automerge/automerge";
 import type { ObjType } from "@automerge/automerge-wasm";
-import { getProperty, isTextObject } from "./helpers";
+import { clone, getProperty, isTextObject } from "./helpers";
 
 export const unpatch = <T extends Record<Prop, ObjType | Text | Counter>>(
   doc: T,
-  patch: Patch,
+  patch: Patch
 ): Patch => {
   if (patch.action === "insert") {
     return {
@@ -39,7 +39,7 @@ export const unpatch = <T extends Record<Prop, ObjType | Text | Counter>>(
         action: "put",
         path: patch.path,
         conflict: false,
-        value: value[index],
+        value: clone(value[index]),
       };
     }
 
@@ -62,7 +62,7 @@ export const unpatch = <T extends Record<Prop, ObjType | Text | Counter>>(
         action: "put",
         path: patch.path,
         conflict: false,
-        value: JSON.parse(JSON.stringify(value)),
+        value: clone(value),
       };
     } else {
       return {
