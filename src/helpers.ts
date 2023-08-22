@@ -21,8 +21,29 @@ export function isPlainObject(arg: any): arg is Record<Prop, any> {
   );
 }
 
+const replacerReviver = () => {
+  const uuid = crypto.randomUUID();
+  return [
+    function (this: Record<string, unknown>, k: string) {
+      const v: unknown = this[k];
+      if (v instanceof Date) {
+        return `${uuid}-${v.getTime()}`;
+      }
+      return v;
+    },
+    (_: string, v: unknown) => {
+      if (typeof v === "string" && v.startsWith(uuid)) {
+        return new Date(parseInt(v.slice(v.lastIndexOf("-") + 1), 10));
+      }
+      return v;
+    },
+  ];
+};
+
+const [replacer, reviver] = replacerReviver();
+
 export function clone<T>(arg: T): T {
-  return JSON.parse(JSON.stringify(arg));
+  return JSON.parse(JSON.stringify(arg, replacer), reviver);
 }
 
 export function isTextObject(arg: any): arg is Text {
