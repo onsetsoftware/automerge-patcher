@@ -45,7 +45,7 @@ export const unpatch = <T>(doc: Doc<T>, patch: Patch): Patch => {
       path: patch.path,
       values: isTextObject(value)
         ? [...Array(length)].map((_, i) => value.get(Number(index) + i))
-        : [...Array(length)].map((_, i) => value[Number(index) + i]),
+        : [...Array(length)].map((_, i) => clone(value[Number(index) + i])),
     };
   }
 
