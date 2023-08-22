@@ -5,6 +5,7 @@ export const documentData: {
   text: Text;
   counter: Counter;
   array: string[];
+  date: Date;
   object: {
     hello: string;
     data?: string;
@@ -23,6 +24,7 @@ export const documentData: {
   };
   deeply: {
     nested: {
+      date: Date;
       object: {
         with: {
           a: {
@@ -39,6 +41,7 @@ export const documentData: {
   text: new Text("hello world"),
   counter: new Counter(0),
   array: ["hello", "world"],
+  date: new Date(1692724609057),
   object: {
     hello: "world",
     empty: "",
@@ -61,6 +64,7 @@ export const documentData: {
   },
   deeply: {
     nested: {
+      date: new Date(1692724609057),
       object: {
         with: {
           a: {

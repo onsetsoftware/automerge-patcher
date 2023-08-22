@@ -60,6 +60,50 @@ describe("Un-patching patches", () => {
     },
 
     {
+      name: "put date",
+      patch: {
+        action: "put",
+        path: ["date"],
+        value: new Date(1692724758677),
+        conflict: false,
+      },
+      expected: {
+        action: "put",
+        path: ["date"],
+        value: new Date(1692724609057),
+        conflict: false,
+      },
+    },
+
+    {
+      name: "del date",
+      patch: {
+        action: "del",
+        path: ["date"],
+      },
+      expected: {
+        action: "put",
+        path: ["date"],
+        value: new Date(1692724609057),
+        conflict: false
+      },
+    },
+
+    {
+      name: "del deeply nested date",
+      patch: {
+        action: "del",
+        path: ["deeply", "nested"],
+      },
+      expected: {
+        action: "put",
+        path: ["deeply", "nested"],
+        value: documentData.deeply.nested,
+        conflict: false
+      },
+    },
+
+    {
       name: "put value where value exists",
       patch: {
         action: "put",
