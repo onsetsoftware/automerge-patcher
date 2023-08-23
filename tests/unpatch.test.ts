@@ -32,6 +32,16 @@ describe("Un-patching patches", () => {
     },
 
     {
+      name: "basic text put",
+      patch: {
+        action: "put",
+        path: ["text", 0],
+        value: "b"
+      },
+      expected: { action: "put", path: ["text", 0], value: "h", conflict: false },
+    },
+
+    {
       name: "array delete",
       patch: {
         action: "del",
