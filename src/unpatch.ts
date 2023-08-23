@@ -60,6 +60,19 @@ export const unpatch = <T>(doc: Doc<T>, patch: Patch): Patch => {
         value: clone(value),
       };
     } else {
+      // getProperty cannot look up the value of text on put actions,
+      // so handle that case separately here.
+      const parent = getProperty(doc, patch.path.slice(0, -1).join("."));
+      const lastPart = patch.path[patch.path.length - 1];
+      if (isTextObject(parent) && typeof lastPart === "number") {
+        return {
+          action: "put",
+          path: patch.path,
+          conflict: false,
+          value: parent.get(lastPart)
+        }
+      }
+
       return {
         action: "del",
         path: patch.path,
