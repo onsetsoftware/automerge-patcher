@@ -1,8 +1,6 @@
 import { Doc, Prop, Text } from "@automerge/automerge";
 import { Path, getByPath, setByPath } from "dot-path-value";
 
-import crypto from "node:crypto";
-
 function baseIsPlainObject(arg: any): arg is Record<string, any> {
   if (arg == null || typeof arg !== "object") {
     return false;
@@ -24,7 +22,8 @@ export function isPlainObject(arg: any): arg is Record<Prop, any> {
 }
 
 const replacerReviver = () => {
-  const uuid = crypto.randomUUID();
+  // we hard code a randon uuid to avoid collisions
+  const uuid = "a4c5c0bf-a658-4af9-a1ad-efeb7f10c793";
   return [
     function(this: Record<string, unknown>, k: string) {
       const v: unknown = this[k];
