@@ -1,61 +1,61 @@
-import { DelPatch, SpliceTextPatch, unstable } from "@automerge/automerge";
+import { DelPatch, SpliceTextPatch, next } from "@automerge/automerge";
 import { bench, describe } from "vitest";
 import { patch } from "../src";
 import { documentDataWithoutText } from "../tests/data";
 import { options } from "./options";
 
-describe("Splice - unstable", () => {
+describe("Splice - next", () => {
   bench(
     "splice",
     () => {
-      const doc = unstable.from(documentDataWithoutText);
-      unstable.change(doc, (doc) => {
-        unstable.splice(doc, ["string"], 5, 0, " there");
+      const doc = next.from(documentDataWithoutText);
+      next.change(doc, (doc) => {
+        next.splice(doc, ["string"], 5, 0, " there");
       });
     },
-    options,
+    options
   );
 
   bench(
     "apply patch",
     () => {
-      const doc = unstable.from(documentDataWithoutText);
+      const doc = next.from(documentDataWithoutText);
       const patches: SpliceTextPatch[] = [
         { action: "splice", path: ["string", 5], value: "there" },
       ];
 
-      unstable.change(doc, (doc) => {
+      next.change(doc, (doc) => {
         patch(doc, patches[0]);
       });
     },
-    options,
+    options
   );
 });
 
-describe("Splice Delete - unstable", () => {
+describe("Splice Delete - next", () => {
   bench(
     "splice",
     () => {
-      const doc = unstable.from(documentDataWithoutText);
-      unstable.change(doc, { patchCallback: console.log }, (doc) => {
-        unstable.splice(doc, ["string"], 5, 3);
+      const doc = next.from(documentDataWithoutText);
+      next.change(doc, (doc) => {
+        next.splice(doc, ["string"], 5, 3);
       });
     },
-    options,
+    options
   );
 
   bench(
     "apply patch",
     () => {
-      const doc = unstable.from(documentDataWithoutText);
+      const doc = next.from(documentDataWithoutText);
       const patches: DelPatch[] = [
         { action: "del", path: ["string", 5], length: 3 },
       ];
 
-      unstable.change(doc, (doc) => {
+      next.change(doc, (doc) => {
         patch(doc, patches[0]);
       });
     },
-    options,
+    options
   );
 });

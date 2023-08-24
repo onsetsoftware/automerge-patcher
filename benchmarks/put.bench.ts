@@ -1,4 +1,4 @@
-import { PutPatch, change, from, unstable } from "@automerge/automerge";
+import { PutPatch, change, from, next } from "@automerge/automerge";
 import { bench, describe } from "vitest";
 import { patch } from "../src";
 import { documentData, documentDataWithoutText } from "../tests/data";
@@ -13,7 +13,7 @@ describe("Put Value", () => {
         doc.object.data = "new value";
       });
     },
-    options,
+    options
   );
 
   bench(
@@ -28,34 +28,34 @@ describe("Put Value", () => {
         patch(doc, patches[0]);
       });
     },
-    options,
+    options
   );
 });
 
-describe("Put Value - unstable", () => {
+describe("Put Value - next", () => {
   bench(
     "put",
     () => {
-      const doc = unstable.from(documentDataWithoutText);
-      unstable.change(doc, (doc) => {
+      const doc = next.from(documentDataWithoutText);
+      next.change(doc, (doc) => {
         doc.object.data = "new value";
       });
     },
-    options,
+    options
   );
 
   bench(
     "apply patch",
     () => {
-      const doc = unstable.from(documentDataWithoutText);
+      const doc = next.from(documentDataWithoutText);
       const patches: PutPatch[] = [
         { action: "put", path: ["object", "data"], value: "new value" },
       ];
 
-      unstable.change(doc, (doc) => {
+      next.change(doc, (doc) => {
         patch(doc, patches[0]);
       });
     },
-    options,
+    options
   );
 });

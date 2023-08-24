@@ -1,4 +1,10 @@
-import type { Doc, Patch, Prop, Text } from "@automerge/automerge";
+import {
+  change,
+  type Doc,
+  type Patch,
+  type Prop,
+  type Text,
+} from "@automerge/automerge";
 import { clone, getProperty, isTextObject } from "./helpers";
 
 export const unpatch = <T>(doc: Doc<T>, patch: Patch): Patch => {
@@ -97,4 +103,13 @@ export const unpatch = <T>(doc: Doc<T>, patch: Patch): Patch => {
   }
 
   throw new Error(`Unknown patch action: ${patch.action}`);
+};
+
+export const unpatchAll = <T>(doc: Doc<T>, patches: Patch[]): Patch[] => {
+  console.log(doc);
+  change(doc, (doc) => {
+    console.log(doc);
+  });
+
+  return patches.map((patch) => unpatch(doc, patch)).reverse();
 };

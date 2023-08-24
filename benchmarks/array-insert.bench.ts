@@ -3,7 +3,7 @@ import {
   change,
   from,
   insertAt,
-  unstable,
+  next,
 } from "@automerge/automerge";
 import { bench, describe } from "vitest";
 import { patch } from "../src";
@@ -19,7 +19,7 @@ describe("Array Insert", () => {
         doc.array.push("there", "my");
       });
     },
-    options,
+    options
   );
 
   bench(
@@ -30,7 +30,7 @@ describe("Array Insert", () => {
         insertAt(doc.array, 2, "there", "my");
       });
     },
-    options,
+    options
   );
 
   bench(
@@ -41,7 +41,7 @@ describe("Array Insert", () => {
         doc.array.splice(2, 0, "there", "my");
       });
     },
-    options,
+    options
   );
 
   bench(
@@ -60,7 +60,7 @@ describe("Array Insert", () => {
         patch(doc, patches[0]);
       });
     },
-    options,
+    options
   );
 });
 
@@ -73,7 +73,7 @@ describe("Array Insert - Deeply Nested", () => {
         doc.deeply.nested.object.with.a.long.path.push("there", "my");
       });
     },
-    options,
+    options
   );
 
   bench(
@@ -92,48 +92,48 @@ describe("Array Insert - Deeply Nested", () => {
         patch(doc, patches[0]);
       });
     },
-    options,
+    options
   );
 });
 
-describe("Array Insert - Unstable", () => {
+describe("Array Insert - next", () => {
   bench(
     "array push",
     () => {
-      const doc = unstable.from(documentDataWithoutText);
-      unstable.change(doc, (doc) => {
+      const doc = next.from(documentDataWithoutText);
+      next.change(doc, (doc) => {
         doc.array.push("there", "my");
       });
     },
-    options,
+    options
   );
 
   bench(
     "insertAt",
     () => {
-      const doc = unstable.from(documentDataWithoutText);
-      unstable.change(doc, (doc) => {
+      const doc = next.from(documentDataWithoutText);
+      next.change(doc, (doc) => {
         insertAt(doc.array, 2, "there", "my");
       });
     },
-    options,
+    options
   );
 
   bench(
     "array splice",
     () => {
-      const doc = unstable.from(documentDataWithoutText);
-      unstable.change(doc, (doc) => {
+      const doc = next.from(documentDataWithoutText);
+      next.change(doc, (doc) => {
         doc.array.splice(2, 0, "there", "my");
       });
     },
-    options,
+    options
   );
 
   bench(
     "apply patch",
     () => {
-      const doc = unstable.from(documentDataWithoutText);
+      const doc = next.from(documentDataWithoutText);
       const patches = [
         {
           action: "insert",
@@ -142,10 +142,10 @@ describe("Array Insert - Unstable", () => {
         } as InsertPatch,
       ];
 
-      unstable.change(doc, (doc) => {
+      next.change(doc, (doc) => {
         patch(doc, patches[0]);
       });
     },
-    options,
+    options
   );
 });

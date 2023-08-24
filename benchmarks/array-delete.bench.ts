@@ -1,10 +1,4 @@
-import {
-  DelPatch,
-  change,
-  deleteAt,
-  from,
-  unstable,
-} from "@automerge/automerge";
+import { DelPatch, change, deleteAt, from, next } from "@automerge/automerge";
 import { bench, describe } from "vitest";
 import { patch } from "../src";
 import { documentData, documentDataWithoutText } from "../tests/data";
@@ -19,7 +13,7 @@ describe("Array Delete", () => {
         deleteAt(doc.array, 1, 1);
       });
     },
-    options,
+    options
   );
 
   bench(
@@ -30,7 +24,7 @@ describe("Array Delete", () => {
         doc.array.splice(1, 1);
       });
     },
-    options,
+    options
   );
 
   bench(
@@ -43,43 +37,43 @@ describe("Array Delete", () => {
         patch(doc, patches[0]);
       });
     },
-    options,
+    options
   );
 });
 
-describe("Array Delete - Unstable", () => {
+describe("Array Delete - next", () => {
   bench(
     "deleteAt",
     () => {
-      const doc = unstable.from(documentDataWithoutText);
-      unstable.change(doc, (doc) => {
+      const doc = next.from(documentDataWithoutText);
+      next.change(doc, (doc) => {
         deleteAt(doc.array, 1, 1);
       });
     },
-    options,
+    options
   );
 
   bench(
     "array splice",
     () => {
-      const doc = unstable.from(documentDataWithoutText);
-      unstable.change(doc, (doc) => {
+      const doc = next.from(documentDataWithoutText);
+      next.change(doc, (doc) => {
         doc.array.splice(1, 1);
       });
     },
-    options,
+    options
   );
 
   bench(
     "apply patch",
     () => {
-      const doc = unstable.from(documentDataWithoutText);
+      const doc = next.from(documentDataWithoutText);
       const patches: DelPatch[] = [{ action: "del", path: ["array", 1] }];
 
-      unstable.change(doc, (doc) => {
+      next.change(doc, (doc) => {
         patch(doc, patches[0]);
       });
     },
-    options,
+    options
   );
 });
