@@ -1,12 +1,11 @@
 import {
+  clone as automergeClone,
+  change,
+  next,
   type Doc,
   type Patch,
   type Prop,
   type Text,
-  next,
-  change,
-  isAutomerge,
-  clone as automergeClone,
 } from "@automerge/automerge";
 import { clone, getProperty, isNext, isTextObject } from "./helpers";
 import { patch } from "./patch";
