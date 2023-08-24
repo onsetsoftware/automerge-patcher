@@ -1,4 +1,4 @@
-import { Doc, Prop, Text } from "@automerge/automerge";
+import { Doc, Prop, Text, next } from "@automerge/automerge";
 import { Path, getByPath, setByPath } from "dot-path-value";
 
 function baseIsPlainObject(arg: any): arg is Record<string, any> {
@@ -25,7 +25,7 @@ const replacerReviver = () => {
   // we hard code a randon uuid to avoid collisions
   const uuid = "a4c5c0bf-a658-4af9-a1ad-efeb7f10c793";
   return [
-    function(this: Record<string, unknown>, k: string) {
+    function (this: Record<string, unknown>, k: string) {
       const v: unknown = this[k];
       if (v instanceof Date) {
         return `${uuid}-${v.getTime()}`;
@@ -61,4 +61,14 @@ export function getProperty<T extends Doc<T>>(
 
 export function setProperty<T>(doc: T | Doc<T>, path: string, value: any): T {
   return setByPath(doc as Record<string, any>, path, value) as T;
+}
+
+// this is a hack for now, but will look to introduce a 1st party function in automerge
+export function isNext(doc: Doc<unknown>) {
+  try {
+    next.getConflicts(doc, "");
+  } catch (e) {
+    return false;
+  }
+  return true;
 }

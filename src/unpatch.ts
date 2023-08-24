@@ -1,11 +1,15 @@
 import {
-  change,
   type Doc,
   type Patch,
   type Prop,
   type Text,
+  next,
+  change,
+  isAutomerge,
+  clone as automergeClone,
 } from "@automerge/automerge";
-import { clone, getProperty, isTextObject } from "./helpers";
+import { clone, getProperty, isNext, isTextObject } from "./helpers";
+import { patch } from "./patch";
 
 export const unpatch = <T>(doc: Doc<T>, patch: Patch): Patch => {
   if (patch.action === "insert") {
@@ -75,8 +79,8 @@ export const unpatch = <T>(doc: Doc<T>, patch: Patch): Patch => {
           action: "put",
           path: patch.path,
           conflict: false,
-          value: parent.get(lastPart)
-        }
+          value: parent.get(lastPart),
+        };
       }
 
       return {
@@ -106,10 +110,16 @@ export const unpatch = <T>(doc: Doc<T>, patch: Patch): Patch => {
 };
 
 export const unpatchAll = <T>(doc: Doc<T>, patches: Patch[]): Patch[] => {
-  console.log(doc);
-  change(doc, (doc) => {
-    console.log(doc);
-  });
+  doc = isNext(doc) ? next.clone(doc) : automergeClone(doc);
 
-  return patches.map((patch) => unpatch(doc, patch)).reverse();
+  return patches
+    .reduce((acc, p) => {
+      const unpatched = unpatch(doc, p);
+      doc = change(doc, (d) => {
+        patch(d as Doc<unknown>, p);
+      });
+      acc.push(unpatched);
+      return acc;
+    }, [] as Patch[])
+    .reverse();
 };

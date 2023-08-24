@@ -41,3 +41,15 @@ console.log(doc3.foo); // bar
 
 
 ```
+
+### Unpatch All
+When capturing the patches from a change function `patchCallback`, each of the patches is applied in turn. 
+As such, each patch only applies to the state of the document at the specific moment. The best (and fastest) way to get the reverse of a change is to use the automerge `diff` function, but it isn't ready quite yet. In the meantime, the `unpatchAll` function is provided to acheive this.
+
+It works by progressively updating a copy of the document after applying each patch, then reversing the next patch based on the new state.
+
+```ts
+const reversed = unpatchAll(doc, patches);
+```
+
+These patches can then be applied as above.

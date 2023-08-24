@@ -27,8 +27,8 @@ export function patch<T>(doc: Doc<T>, patch: Patch) {
         path.reverse().join("."),
         new Text(
           value.slice(0, Number(index)) +
-          patch.values.join("") +
-          value.slice(Number(index))
+            patch.values.join("") +
+            value.slice(Number(index))
         )
       );
       return;

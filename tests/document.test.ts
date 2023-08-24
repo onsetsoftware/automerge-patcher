@@ -2,10 +2,16 @@ import {
   InsertPatch,
   Patch,
   SpliceTextPatch,
+  change,
+  clone,
+  deleteAt,
+  from,
+  insertAt,
   next,
 } from "@automerge/automerge";
 import { describe, test, expect } from "vitest";
 import { patch, unpatch } from "../src";
+import { unpatchAll } from "../src/unpatch";
 
 type DataType = {
   values: string[];
@@ -47,6 +53,42 @@ describe("next Document Tests", () => {
     });
 
     expect(unpatched.values).toEqual(["hello"]);
+  });
+
+  test("moving a string in an array of strings", () => {
+    const doc = next.from<DataType>({
+      values: ["oh", "you", "pretty", "things", "don't", "you", "know"],
+    });
+
+    const patches: Patch[] = [];
+
+    const changed = next.change(
+      doc,
+      {
+        patchCallback: (p) => {
+          patches.push(...p);
+        },
+      },
+      (doc) => {
+        insertAt(doc.values, 0, "things");
+        deleteAt(doc.values, 4);
+      }
+    );
+    const reverse = unpatchAll(doc, patches);
+
+    expect(reverse).toEqual([
+      { action: "del", path: ["values", 0, 0], length: 6 },
+      { action: "insert", path: ["values", 4], values: ["things"] },
+      { action: "del", path: ["values", 0], length: 1 },
+    ]);
+
+    const updated = next.change(changed, (doc) => {
+      reverse.forEach((p) => {
+        patch(doc, p);
+      });
+    });
+
+    expect(updated.values).toEqual(doc.values);
   });
 
   test("reversing a delete patch when removing an object", () => {
