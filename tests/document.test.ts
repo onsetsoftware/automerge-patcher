@@ -2,14 +2,11 @@ import {
   InsertPatch,
   Patch,
   SpliceTextPatch,
-  change,
-  clone,
   deleteAt,
-  from,
   insertAt,
-  next,
+  next
 } from "@automerge/automerge";
-import { describe, test, expect } from "vitest";
+import { describe, expect, test } from "vitest";
 import { patch, unpatch } from "../src";
 import { unpatchAll } from "../src/unpatch";
 
