@@ -32,6 +32,16 @@ describe("Un-patching patches", () => {
     },
 
     {
+      name: "basic text put",
+      patch: {
+        action: "put",
+        path: ["text", 0],
+        value: "b"
+      },
+      expected: { action: "put", path: ["text", 0], value: "h", conflict: false },
+    },
+
+    {
       name: "array delete",
       patch: {
         action: "del",
@@ -56,6 +66,50 @@ describe("Un-patching patches", () => {
         action: "del",
         path: ["array", 1],
         length: 2,
+      },
+    },
+
+    {
+      name: "put date",
+      patch: {
+        action: "put",
+        path: ["date"],
+        value: new Date(1692724758677),
+        conflict: false,
+      },
+      expected: {
+        action: "put",
+        path: ["date"],
+        value: new Date(1692724609057),
+        conflict: false,
+      },
+    },
+
+    {
+      name: "del date",
+      patch: {
+        action: "del",
+        path: ["date"],
+      },
+      expected: {
+        action: "put",
+        path: ["date"],
+        value: new Date(1692724609057),
+        conflict: false
+      },
+    },
+
+    {
+      name: "del deeply nested date",
+      patch: {
+        action: "del",
+        path: ["deeply", "nested"],
+      },
+      expected: {
+        action: "put",
+        path: ["deeply", "nested"],
+        value: documentData.deeply.nested,
+        conflict: false
       },
     },
 

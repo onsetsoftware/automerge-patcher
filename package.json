@@ -10,35 +10,36 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "test": "vitest --watch",
+    "bench": "vitest bench",
     "vitest.commandLine": "npm vitest run"
   },
   "devDependencies": {
     "typescript": "^5.0.0",
     "vite": "^4.0.0",
-    "vite-plugin-dts": "^2.1.0",
-    "vite-plugin-externalize-deps": "^0.6.0",
+    "vite-plugin-dts": "^3.0.0",
+    "vite-plugin-externalize-deps": "^0.7.0",
     "vite-plugin-top-level-await": "^1.3.0",
     "vite-plugin-wasm": "^3.2.2",
-    "vitest": "^0.32.0"
+    "vitest": "0.34.1"
   },
   "peerDependencies": {
-    "@automerge/automerge": "2.0.3"
+    "@automerge/automerge": "^2.1.0"
   },
   "files": [
     "dist"
   ],
-  "main": "./dist/automerge-patcher.umd.js",
-  "module": "./dist/automerge-patcher.es.js",
+  "main": "./dist/automerge-patcher.umd.cjs",
+  "module": "./dist/automerge-patcher.js",
   "exports": {
     ".": {
-      "import": "./dist/automerge-patcher.es.js",
-      "require": "./dist/automerge-patcher.umd.js",
+      "import": "./dist/automerge-patcher.js",
+      "require": "./dist/automerge-patcher.umd.cjs",
       "types": "./dist/types/index.d.ts"
     }
   },
   "types": "./dist/types/index.d.ts",
   "dependencies": {
-    "dot-path-value": "^0.0.9",
+    "dot-path-value": "^0.0.10",
     "is-plain-object": "^5.0.0"
   }
 }

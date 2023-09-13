@@ -1,2 +1,2 @@
-export { unpatch } from "./unpatch";
+export { unpatch, unpatchAll } from "./unpatch";
 export { patch } from "./patch";

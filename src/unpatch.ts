@@ -1,12 +1,16 @@
-import type { Counter, Patch, Prop, Text } from "@automerge/automerge";
-import type { ObjType } from "@automerge/automerge-wasm";
-import { getProperty } from "./helpers";
-import { isTextObject } from "./helpers";
+import {
+  clone as automergeClone,
+  change,
+  next,
+  type Doc,
+  type Patch,
+  type Prop,
+  type Text,
+} from "@automerge/automerge";
+import { clone, getProperty, isNext, isTextObject } from "./helpers";
+import { patch } from "./patch";
 
-export const unpatch = <T extends Record<Prop, ObjType | Text | Counter>>(
-  doc: T,
-  patch: Patch,
-): Patch => {
+export const unpatch = <T>(doc: Doc<T>, patch: Patch): Patch => {
   if (patch.action === "insert") {
     return {
       action: "del",
@@ -19,8 +23,7 @@ export const unpatch = <T extends Record<Prop, ObjType | Text | Counter>>(
     const [index, ...path] = [...patch.path].reverse();
 
     const value = getProperty(doc, path.reverse().join("."), doc) as
-      | Record<string | number, any>
-      | T
+      | Record<Prop, any>
       | Text
       | Array<any>
       | string;
@@ -40,7 +43,7 @@ export const unpatch = <T extends Record<Prop, ObjType | Text | Counter>>(
         action: "put",
         path: patch.path,
         conflict: false,
-        value: value[index],
+        value: clone(value[index]),
       };
     }
 
@@ -51,7 +54,7 @@ export const unpatch = <T extends Record<Prop, ObjType | Text | Counter>>(
       path: patch.path,
       values: isTextObject(value)
         ? [...Array(length)].map((_, i) => value.get(Number(index) + i))
-        : [...Array(length)].map((_, i) => value[Number(index) + i]),
+        : [...Array(length)].map((_, i) => clone(value[Number(index) + i])),
     };
   }
 
@@ -63,9 +66,22 @@ export const unpatch = <T extends Record<Prop, ObjType | Text | Counter>>(
         action: "put",
         path: patch.path,
         conflict: false,
-        value: JSON.parse(JSON.stringify(value)),
+        value: clone(value),
       };
     } else {
+      // getProperty cannot look up the value of text on put actions,
+      // so handle that case separately here.
+      const parent = getProperty(doc, patch.path.slice(0, -1).join("."));
+      const lastPart = patch.path[patch.path.length - 1];
+      if (isTextObject(parent) && typeof lastPart === "number") {
+        return {
+          action: "put",
+          path: patch.path,
+          conflict: false,
+          value: parent.get(lastPart),
+        };
+      }
+
       return {
         action: "del",
         path: patch.path,
@@ -89,5 +105,20 @@ export const unpatch = <T extends Record<Prop, ObjType | Text | Counter>>(
     };
   }
 
-  throw new Error(`Unknown patch action: ${(patch as any).action}`);
+  throw new Error(`Unknown patch action: ${patch.action}`);
+};
+
+export const unpatchAll = <T>(doc: Doc<T>, patches: Patch[]): Patch[] => {
+  doc = isNext(doc) ? next.clone(doc) : automergeClone(doc);
+
+  const inverse: Patch[] = [];
+
+  change(doc, (d) => {
+    patches.forEach((p) => {
+      inverse.push(unpatch(d as Doc<unknown>, p));
+      patch(d as Doc<unknown>, p);
+    });
+  });
+
+  return inverse.reverse();
 };

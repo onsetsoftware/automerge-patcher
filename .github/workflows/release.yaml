@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - main
+      - next
 
 jobs:
   check_if_version_upgraded:
@@ -27,8 +28,8 @@ jobs:
     steps:
       - uses: actions/setup-node@v3
         with:
-          node-version: '16.x'
-          registry-url: 'https://registry.npmjs.org'
+          node-version: "16.x"
+          registry-url: "https://registry.npmjs.org"
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
@@ -68,7 +69,7 @@ jobs:
         with:
           name: Automerge Patcher v${{ needs.check_if_version_upgraded.outputs.version }}
           tag_name: v${{ needs.check_if_version_upgraded.outputs.version }}
-          target_commitish: main
+          target_commitish: ${{ github.ref_name }}
           generate_release_notes: true
           draft: false
         env:
