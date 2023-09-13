@@ -4,7 +4,7 @@ import {
   SpliceTextPatch,
   deleteAt,
   insertAt,
-  next
+  next,
 } from "@automerge/automerge";
 import { describe, expect, test } from "vitest";
 import { patch, unpatch } from "../src";
@@ -50,6 +50,29 @@ describe("next Document Tests", () => {
     });
 
     expect(unpatched.values).toEqual(["hello"]);
+  });
+
+  test("unpatch delete a string in an array", () => {
+    const doc = next.from<DataType>({
+      values: ["oh", "you", "pretty", "things", "don't", "you", "know"],
+    });
+
+    next.change(
+      doc,
+      {
+        patchCallback: (patches, info) => {
+          const reverse = unpatchAll(info.before, patches);
+          expect(reverse).toEqual([
+            { action: "insert", path: ["values", 4], values: ["you"] },
+            { action: "insert", path: ["values", 2], values: ["pretty"] },
+          ]);
+        },
+      },
+      (doc) => {
+        deleteAt(doc.values, 2);
+        deleteAt(doc.values, 4);
+      }
+    );
   });
 
   test("moving a string in an array of strings", () => {

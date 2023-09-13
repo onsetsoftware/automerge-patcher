@@ -111,14 +111,14 @@ export const unpatch = <T>(doc: Doc<T>, patch: Patch): Patch => {
 export const unpatchAll = <T>(doc: Doc<T>, patches: Patch[]): Patch[] => {
   doc = isNext(doc) ? next.clone(doc) : automergeClone(doc);
 
-  return patches
-    .reduce((acc, p) => {
-      const unpatched = unpatch(doc, p);
-      doc = change(doc, (d) => {
-        patch(d as Doc<unknown>, p);
-      });
-      acc.push(unpatched);
-      return acc;
-    }, [] as Patch[])
-    .reverse();
+  const inverse: Patch[] = [];
+
+  change(doc, (d) => {
+    patches.forEach((p) => {
+      inverse.push(unpatch(d as Doc<unknown>, p));
+      patch(d as Doc<unknown>, p);
+    });
+  });
+
+  return inverse.reverse();
 };

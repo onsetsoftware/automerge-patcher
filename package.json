@@ -23,7 +23,7 @@
     "vitest": "0.34.1"
   },
   "peerDependencies": {
-    "@automerge/automerge": "next"
+    "@automerge/automerge": "^2.1.0"
   },
   "files": [
     "dist"
