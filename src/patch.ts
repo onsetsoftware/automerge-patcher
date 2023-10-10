@@ -47,7 +47,9 @@ export function patch<T>(doc: Doc<T>, patch: Patch) {
   if (patch.action === "del") {
     const [index, ...path] = [...patch.path].reverse();
 
-    const value: any = getProperty(doc, path.reverse().join("."));
+    const value: any = path.length
+      ? getProperty(doc, path.reverse().join("."))
+      : doc;
 
     if (typeof value === "string") {
       next.splice(doc, path, index as number, patch.length || 1);
@@ -61,6 +63,7 @@ export function patch<T>(doc: Doc<T>, patch: Patch) {
     }
 
     value.deleteAt(Number(index), patch.length || 1);
+
     return;
   }
 

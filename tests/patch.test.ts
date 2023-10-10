@@ -19,37 +19,46 @@ describe("Applying Patches", () => {
     expected: any;
     path: string;
   }[] = [
-      {
-        name: "insert text",
-        patch: {
-          action: "insert",
-          path: ["text", 6],
-          values: ["t", "h", "e", "r", "e", " "],
-        },
-        path: "text",
-        expected: "hello there world",
+    {
+      name: "insert text",
+      patch: {
+        action: "insert",
+        path: ["text", 6],
+        values: ["t", "h", "e", "r", "e", " "],
       },
-      {
-        name: "delete text",
-        patch: {
-          action: "del",
-          path: ["text", 2],
-          length: 3,
-        },
-        path: "text",
-        expected: "he world",
+      path: "text",
+      expected: "hello there world",
+    },
+    {
+      name: "delete text",
+      patch: {
+        action: "del",
+        path: ["text", 2],
+        length: 3,
       },
-      {
-        name: "insert text",
-        patch: {
-          action: "insert",
-          path: ["emptyText", 0],
-          values: ["h", "e", "l", "l", "o"],
-        },
-        path: "emptyText",
-        expected: "hello",
+      path: "text",
+      expected: "he world",
+    },
+    {
+      name: "insert text",
+      patch: {
+        action: "insert",
+        path: ["emptyText", 0],
+        values: ["h", "e", "l", "l", "o"],
       },
-    ];
+      path: "emptyText",
+      expected: "hello",
+    },
+    {
+      name: "delete root property",
+      patch: {
+        action: "del",
+        path: ["optional"],
+      },
+      path: "optional",
+      expected: null,
+    },
+  ];
 
   const tests: { name: string; patch: Patch; expected: any; path: string }[] = [
     {
@@ -121,27 +130,27 @@ describe("Applying Patches", () => {
     expected: any;
     path: string;
   }[] = [
-      {
-        name: "insert text",
-        patch: {
-          action: "splice",
-          path: ["object", "hello", 5],
-          value: " there",
-        },
-        path: "object.hello",
-        expected: "world there",
+    {
+      name: "insert text",
+      patch: {
+        action: "splice",
+        path: ["object", "hello", 5],
+        value: " there",
       },
-      {
-        name: "delete text",
-        patch: {
-          action: "del",
-          path: ["object", "hello", 1],
-          length: 2,
-        },
-        path: "object.hello",
-        expected: "wld",
+      path: "object.hello",
+      expected: "world there",
+    },
+    {
+      name: "delete text",
+      patch: {
+        action: "del",
+        path: ["object", "hello", 1],
+        length: 2,
       },
-    ];
+      path: "object.hello",
+      expected: "wld",
+    },
+  ];
 
   [...stableTests, ...tests].forEach(({ name, patch, expected, path }) => {
     test(name, () => {

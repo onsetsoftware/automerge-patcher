@@ -6,6 +6,7 @@ export const documentData: {
   counter: Counter;
   array: string[];
   date: Date;
+  optional?: number;
   object: {
     hello: string;
     data?: string;
@@ -46,6 +47,7 @@ export const documentData: {
     hello: "world",
     empty: "",
   },
+  optional: 1,
   emptyText: "" as unknown as Text, // this is the state which is created
   // when a text is created with an empty string patch
   emptyString: "",
