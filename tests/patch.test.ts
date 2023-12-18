@@ -2,12 +2,14 @@ import { change, type Doc, from, Patch, next } from "@automerge/automerge";
 import { patch as applyPatch } from "../src";
 import { beforeEach, describe, expect, test } from "vitest";
 import { documentData } from "./data";
-import { getProperty } from "../src/helpers";
+import { clone, getProperty } from "../src/helpers";
 
 describe("Applying Patches", () => {
   let doc: Doc<typeof documentData>;
   let nextDoc: Doc<Omit<typeof documentData, "text">>;
+  let plainDoc: Doc<typeof documentData>;
   beforeEach(() => {
+    plainDoc = clone(documentData);
     doc = from(documentData);
     const { text, ...withoutText } = documentData;
     nextDoc = next.from({ ...withoutText });
@@ -131,7 +133,7 @@ describe("Applying Patches", () => {
     path: string;
   }[] = [
     {
-      name: "insert text",
+      name: "splice insert text",
       patch: {
         action: "splice",
         path: ["object", "hello", 5],
@@ -141,7 +143,7 @@ describe("Applying Patches", () => {
       expected: "world there",
     },
     {
-      name: "delete text",
+      name: "splice delete text",
       patch: {
         action: "del",
         path: ["object", "hello", 1],
@@ -153,25 +155,35 @@ describe("Applying Patches", () => {
   ];
 
   [...stableTests, ...tests].forEach(({ name, patch, expected, path }) => {
-    test(name, () => {
+    test("Automerge stable: " + name, () => {
       const newDoc = change(doc, (doc) => {
         applyPatch(doc, patch);
       });
 
       expect(
-        JSON.parse(JSON.stringify(getProperty(newDoc, path) || null))
+        JSON.parse(JSON.stringify(getProperty(newDoc, path) || null)),
       ).toEqual(expected);
     });
   });
 
+  [...stableTests, ...tests, ...nextTests].forEach(
+    ({ name, patch, expected, path }) => {
+      test("JS: " + name, () => {
+        applyPatch(plainDoc, patch);
+
+        expect(getProperty(plainDoc, path) || null).toEqual(expected);
+      });
+    },
+  );
+
   [...tests, ...nextTests].forEach(({ name, patch, expected, path }) => {
-    test(name, () => {
+    test("Automerge next: " + name, () => {
       const newDoc = next.change(nextDoc, (doc) => {
         applyPatch(doc, patch);
       });
 
       expect(
-        JSON.parse(JSON.stringify(getProperty(newDoc, path) || null))
+        JSON.parse(JSON.stringify(getProperty(newDoc, path) || null)),
       ).toEqual(expected);
     });
   });

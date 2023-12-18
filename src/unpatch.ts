@@ -1,13 +1,10 @@
 import {
-  clone as automergeClone,
-  change,
-  next,
   type Doc,
   type Patch,
   type Prop,
   type Text,
 } from "@automerge/automerge";
-import { clone, getProperty, isNext, isTextObject } from "./helpers";
+import { clone, getProperty, isTextObject } from "./helpers";
 import { patch } from "./patch";
 
 export const unpatch = <T>(doc: Doc<T>, patch: Patch): Patch => {
@@ -109,15 +106,13 @@ export const unpatch = <T>(doc: Doc<T>, patch: Patch): Patch => {
 };
 
 export const unpatchAll = <T>(doc: Doc<T>, patches: Patch[]): Patch[] => {
-  doc = isNext(doc) ? next.clone(doc) : automergeClone(doc);
+  const copy = clone(doc);
 
   const inverse: Patch[] = [];
 
-  change(doc, (d) => {
-    patches.forEach((p) => {
-      inverse.push(unpatch(d as Doc<unknown>, p));
-      patch(d as Doc<unknown>, p);
-    });
+  patches.forEach((p) => {
+    inverse.push(unpatch(copy, p));
+    patch(copy, p);
   });
 
   return inverse.reverse();

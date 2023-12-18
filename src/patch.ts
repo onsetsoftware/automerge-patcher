@@ -4,7 +4,9 @@ import {
   next,
   type Doc,
   type Patch,
+  isAutomerge,
 } from "@automerge/automerge";
+
 import {
   getProperty,
   isPlainObject,
@@ -13,6 +15,8 @@ import {
 } from "./helpers";
 
 export function patch<T>(doc: Doc<T>, patch: Patch) {
+  const automerge = isAutomerge(doc);
+
   if (patch.action === "insert") {
     const [index, ...path] = [...patch.path].reverse();
 
@@ -22,15 +26,25 @@ export function patch<T>(doc: Doc<T>, patch: Patch) {
       | any[];
 
     if (typeof value === "string") {
-      setProperty(
-        doc,
-        path.reverse().join("."),
-        new Text(
+      if (automerge) {
+        setProperty(
+          doc,
+          path.reverse().join("."),
+          new Text(
+            value.slice(0, Number(index)) +
+              patch.values.join("") +
+              value.slice(Number(index)),
+          ),
+        );
+      } else {
+        setProperty(
+          doc,
+          path.reverse().join("."),
           value.slice(0, Number(index)) +
             patch.values.join("") +
-            value.slice(Number(index))
-        )
-      );
+            value.slice(Number(index)),
+        );
+      }
       return;
     }
 
@@ -39,8 +53,11 @@ export function patch<T>(doc: Doc<T>, patch: Patch) {
       return;
     }
 
-    insertAt(value, Number(index), ...patch.values);
-
+    if (automerge) {
+      insertAt(value, Number(index), ...patch.values);
+    } else {
+      value.splice(Number(index), 0, ...patch.values);
+    }
     return;
   }
 
@@ -52,7 +69,16 @@ export function patch<T>(doc: Doc<T>, patch: Patch) {
       : doc;
 
     if (typeof value === "string") {
-      next.splice(doc, path, index as number, patch.length || 1);
+      if (automerge) {
+        next.splice(doc, path, index as number, patch.length || 1);
+      } else {
+        setProperty(
+          doc,
+          path.join("."),
+          value.substring(0, Number(index)) +
+            value.substring(Number(index) + (patch.length || 1)),
+        );
+      }
 
       return;
     }
@@ -62,7 +88,11 @@ export function patch<T>(doc: Doc<T>, patch: Patch) {
       return;
     }
 
-    value.deleteAt(Number(index), patch.length || 1);
+    if (automerge) {
+      value.deleteAt(Number(index), patch.length || 1);
+    } else {
+      value.splice(Number(index), patch.length || 1);
+    }
 
     return;
   }
@@ -73,19 +103,31 @@ export function patch<T>(doc: Doc<T>, patch: Patch) {
   }
 
   if (patch.action === "inc") {
-    const value: any = getProperty(doc, patch.path.join("."));
-    value.increment(patch.value);
+    let value: any = getProperty(doc, patch.path.join("."));
+    if (automerge) {
+      value.increment(patch.value);
+    } else {
+      value = Number(value);
+      setProperty(doc, patch.path.join("."), value + patch.value);
+    }
     return;
   }
 
   if (patch.action === "splice") {
-    next.splice(
-      doc,
-      patch.path.slice(0, -1),
-      patch.path.at(-1) as number,
-      0,
-      patch.value
-    );
+    const [index, ...path] = [...patch.path].reverse();
+    if (automerge) {
+      next.splice(doc, path.reverse(), index as number, 0, patch.value);
+    } else {
+      const value: any = getProperty(doc, path.reverse().join("."));
+
+      setProperty(
+        doc,
+        path.join("."),
+        value.substring(0, Number(index)) +
+          patch.value +
+          value.substring(Number(index)),
+      );
+    }
 
     return;
   }

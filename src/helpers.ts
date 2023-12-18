@@ -22,13 +22,21 @@ export function isPlainObject(arg: any): arg is Record<Prop, any> {
 }
 
 const replacerReviver = () => {
-  // we hard code a randon uuid to avoid collisions
+  // we hard code a random uuid to avoid collisions
   const uuid = "a4c5c0bf-a658-4af9-a1ad-efeb7f10c793";
   return [
     function (this: Record<string, unknown>, k: string) {
       const v: unknown = this[k];
       if (v instanceof Date) {
         return `${uuid}-${v.getTime()}`;
+      }
+      if (
+        typeof v === "object" &&
+        v !== null &&
+        "toJSON" in v &&
+        typeof v.toJSON === "function"
+      ) {
+        return v.toJSON();
       }
       return v;
     },
@@ -54,7 +62,7 @@ export function isTextObject(arg: any): arg is Text {
 export function getProperty<T extends Doc<T>>(
   doc: T,
   path: string,
-  defaultValue?: any
+  defaultValue?: any,
 ): any {
   return getByPath(doc, path as Path<T>) ?? defaultValue;
 }
