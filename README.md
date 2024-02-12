@@ -12,7 +12,7 @@ npm install @onsetsoftware/automerge-patcher
 
 ### patch<T>(doc: Doc<T>, patch: Patch): Patch
 
-Used to take a single automerge patch and apply it to a document.
+Used to take a single automerge patch and apply it to a document. It can also be used to apply an Automerge patch to a plain javascript object with the same shape as the relevant document
 
 ```ts
 import { patch } from "@onsetsoftware/automerge-patcher";
@@ -33,6 +33,7 @@ console.log(updated); // => { foo: 'baz' }
 ```
 
 ### unpatch(beforeDoc: Doc<T>, patch: Patch): Patch
+
 Provides the inverse of a patch, given the initial document (before the change) on which the patch applies.
 
 ```ts
@@ -51,11 +52,12 @@ console.log(inverse); // => { action: 'put', path: ["foo"], value: "bar"}
 ```
 
 ### unpatchAll(beforeDoc: Doc<T>, patches: Patch[]): Patch[]
+
 `unpatchAll` can be used to reverse an array of patches relative to the initial (before changes) document which produced them.
 It works by progressively updating a copy of the document after applying each patch, then reversing the next patch based on the new state.
 
 > [!NOTE]  
-> The best (and fastest) way to get the reverse of a change is to use the automerge `diff` function, but it isn't ready quite yet. 
+> The best (and fastest) way to get the reverse of a change is to use the automerge `diff` function, but it isn't ready quite yet.
 > In the meantime, the `unpatchAll` function is provided to acheive this.
 
 ```typescript
@@ -76,7 +78,7 @@ const doc2 = change(
   },
   (doc) => {
     doc.foo = "baz";
-  }
+  },
 );
 
 console.log(reverse); // [{action: 'put', path: ['foo'], value: 'bar'}]
