@@ -161,7 +161,9 @@ describe("Applying Patches", () => {
       });
 
       expect(
-        JSON.parse(JSON.stringify(getProperty(newDoc, path) || null)),
+        JSON.parse(
+          JSON.stringify(getProperty(newDoc, path.split(".")) || null),
+        ),
       ).toEqual(expected);
     });
   });
@@ -171,7 +173,9 @@ describe("Applying Patches", () => {
       test("JS: " + name, () => {
         applyPatch(plainDoc, patch);
 
-        expect(getProperty(plainDoc, path) || null).toEqual(expected);
+        expect(getProperty(plainDoc, path.split(".")) || null).toEqual(
+          expected,
+        );
       });
     },
   );
@@ -183,7 +187,9 @@ describe("Applying Patches", () => {
       });
 
       expect(
-        JSON.parse(JSON.stringify(getProperty(newDoc, path) || null)),
+        JSON.parse(
+          JSON.stringify(getProperty(newDoc, path.split(".")) || null),
+        ),
       ).toEqual(expected);
     });
   });
@@ -203,8 +209,8 @@ describe("Applying Patches", () => {
     expect(newDoc.foo).toEqual("hello");
   });
 
-  test("change the value of the property at path [\".\"]", () => {
-    const doc = next.from({ ".": 0});
+  test('change the value of the property at path ["."]', () => {
+    const doc = next.from({ ".": 0 });
 
     const newDoc = next.change(doc, (doc) => {
       applyPatch(doc, {
@@ -216,8 +222,8 @@ describe("Applying Patches", () => {
     expect(newDoc["."]).toEqual(1);
   });
 
-  test("change the value of the property at path [\"test.\", \".x\"]", () => {
-    const doc = next.from({ "test.": {".x": 0}});
+  test('change the value of the property at path ["test.", ".x"]', () => {
+    const doc = next.from({ "test.": { ".x": 0 } });
 
     const newDoc = next.change(doc, (doc) => {
       applyPatch(doc, {
@@ -229,8 +235,8 @@ describe("Applying Patches", () => {
     expect(newDoc["test."][".x"]).toEqual(1);
   });
 
-  test("change the value of the property at path [\" x \"]", () => {
-    const doc = next.from({ " x ": 0});
+  test('change the value of the property at path [" x "]', () => {
+    const doc = next.from({ " x ": 0 });
 
     const newDoc = next.change(doc, (doc) => {
       applyPatch(doc, {

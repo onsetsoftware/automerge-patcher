@@ -20,16 +20,13 @@ export function patch<T>(doc: Doc<T>, patch: Patch) {
   if (patch.action === "insert") {
     const [index, ...path] = [...patch.path].reverse();
 
-    const value = getProperty(doc, path.reverse().join(".")) as
-      | string
-      | Text
-      | any[];
+    const value = getProperty(doc, path.reverse()) as string | Text | any[];
 
     if (typeof value === "string") {
       if (automerge) {
         setProperty(
           doc,
-          path.reverse().join("."),
+          path.reverse(),
           new Text(
             value.slice(0, Number(index)) +
               patch.values.join("") +
@@ -39,7 +36,7 @@ export function patch<T>(doc: Doc<T>, patch: Patch) {
       } else {
         setProperty(
           doc,
-          path.reverse().join("."),
+          path.reverse(),
           value.slice(0, Number(index)) +
             patch.values.join("") +
             value.slice(Number(index)),
@@ -64,9 +61,7 @@ export function patch<T>(doc: Doc<T>, patch: Patch) {
   if (patch.action === "del") {
     const [index, ...path] = [...patch.path].reverse();
 
-    const value: any = path.length
-      ? getProperty(doc, path.reverse().join("."))
-      : doc;
+    const value: any = path.length ? getProperty(doc, path.reverse()) : doc;
 
     if (typeof value === "string") {
       if (automerge) {
@@ -74,7 +69,7 @@ export function patch<T>(doc: Doc<T>, patch: Patch) {
       } else {
         setProperty(
           doc,
-          path.join("."),
+          path,
           value.substring(0, Number(index)) +
             value.substring(Number(index) + (patch.length || 1)),
         );
@@ -98,17 +93,17 @@ export function patch<T>(doc: Doc<T>, patch: Patch) {
   }
 
   if (patch.action === "put") {
-    setProperty(doc, patch.path.join("."), patch.value);
+    setProperty(doc, patch.path, patch.value);
     return;
   }
 
   if (patch.action === "inc") {
-    let value: any = getProperty(doc, patch.path.join("."));
+    let value: any = getProperty(doc, patch.path);
     if (automerge) {
       value.increment(patch.value);
     } else {
       value = Number(value);
-      setProperty(doc, patch.path.join("."), value + patch.value);
+      setProperty(doc, patch.path, value + patch.value);
     }
     return;
   }
@@ -118,11 +113,11 @@ export function patch<T>(doc: Doc<T>, patch: Patch) {
     if (automerge) {
       next.splice(doc, path.reverse(), index as number, 0, patch.value);
     } else {
-      const value: any = getProperty(doc, path.reverse().join("."));
+      const value: any = getProperty(doc, path.reverse());
 
       setProperty(
         doc,
-        path.join("."),
+        path,
         value.substring(0, Number(index)) +
           patch.value +
           value.substring(Number(index)),

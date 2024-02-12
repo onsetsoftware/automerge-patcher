@@ -19,7 +19,7 @@ export const unpatch = <T>(doc: Doc<T>, patch: Patch): Patch => {
   if (patch.action === "del") {
     const [index, ...path] = [...patch.path].reverse();
 
-    const value = getProperty(doc, path.reverse().join("."), doc) as
+    const value = getProperty(doc, path.reverse(), doc) as
       | Record<Prop, any>
       | Text
       | Array<any>
@@ -56,7 +56,7 @@ export const unpatch = <T>(doc: Doc<T>, patch: Patch): Patch => {
   }
 
   if (patch.action === "put") {
-    const value = getProperty(doc, patch.path.join("."));
+    const value = getProperty(doc, patch.path);
 
     if (value !== undefined) {
       return {
@@ -68,7 +68,7 @@ export const unpatch = <T>(doc: Doc<T>, patch: Patch): Patch => {
     } else {
       // getProperty cannot look up the value of text on put actions,
       // so handle that case separately here.
-      const parent = getProperty(doc, patch.path.slice(0, -1).join("."));
+      const parent = getProperty(doc, patch.path.slice(0, -1));
       const lastPart = patch.path[patch.path.length - 1];
       if (isTextObject(parent) && typeof lastPart === "number") {
         return {
