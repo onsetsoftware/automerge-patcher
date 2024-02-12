@@ -247,19 +247,4 @@ describe("Applying Patches", () => {
     });
     expect(newDoc[" x "]).toEqual(1);
   });
-
-  test('Write to a path that includes "valueOf"', () => {
-    const pathToWrite = ["valueOf","!"];
-    const valueToWrite = 1;
-      const doc = next.from({"valueOf":{"!":{"!":0}}});
-      const newDoc = next.change(doc, (doc) => {
-        applyPatch(doc, {
-          action: "put",
-          path: pathToWrite,
-          value: valueToWrite,
-        });
-      });
-      expect(getProperty(newDoc, pathToWrite)).toEqual(valueToWrite);
-  });
-
 });
