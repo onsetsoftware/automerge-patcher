@@ -39,7 +39,6 @@
   },
   "types": "./dist/types/index.d.ts",
   "dependencies": {
-    "dot-path-value": "^0.0.10",
     "is-plain-object": "^5.0.0"
   }
 }

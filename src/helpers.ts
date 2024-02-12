@@ -1,5 +1,4 @@
 import { Doc, Prop, Text, next } from "@automerge/automerge";
-import { Path, getByPath, setByPath } from "dot-path-value";
 
 function baseIsPlainObject(arg: any): arg is Record<string, any> {
   if (arg == null || typeof arg !== "object") {
@@ -61,14 +60,35 @@ export function isTextObject(arg: any): arg is Text {
 
 export function getProperty<T extends Doc<T>>(
   doc: T,
-  path: string,
+  path: string[] | Prop[],
   defaultValue?: any,
 ): any {
-  return getByPath(doc, path as Path<T>) ?? defaultValue;
+  return path.reduce((acc, key) => acc?.[key as keyof T], doc) ?? defaultValue;
 }
 
-export function setProperty<T>(doc: T | Doc<T>, path: string, value: any): T {
-  return setByPath(doc as Record<string, any>, path, value) as T;
+export function setProperty<T extends object>(
+  doc: T | Doc<T>,
+  path: string[] | Prop[],
+  value: any,
+): T {
+  const segments = path.slice() as unknown as (keyof T)[];
+  const lastKey = segments.pop();
+
+  let target: any = doc;
+
+  for (let i = 0; i < segments.length; i++) {
+    const key = segments[i];
+    if (!(key in target)) {
+      target[key] = {};
+    }
+    target = target[key];
+  }
+
+  if (lastKey) {
+    target[lastKey] = value;
+  }
+
+  return doc;
 }
 
 // this is a hack for now, but will look to introduce a 1st party function in automerge
