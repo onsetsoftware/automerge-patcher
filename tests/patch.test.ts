@@ -202,4 +202,43 @@ describe("Applying Patches", () => {
 
     expect(newDoc.foo).toEqual("hello");
   });
+
+  test("change the value of the property at path [\".\"]", () => {
+    const doc = next.from({ ".": 0});
+
+    const newDoc = next.change(doc, (doc) => {
+      applyPatch(doc, {
+        action: "put",
+        path: ["."],
+        value: 1,
+      });
+    });
+    expect(newDoc["."]).toEqual(1);
+  });
+
+  test("change the value of the property at path [\"test.\", \".x\"]", () => {
+    const doc = next.from({ "test.": {".x": 0}});
+
+    const newDoc = next.change(doc, (doc) => {
+      applyPatch(doc, {
+        action: "put",
+        path: ["test.", ".x"],
+        value: 1,
+      });
+    });
+    expect(newDoc["test."][".x"]).toEqual(1);
+  });
+
+  test("change the value of the property at path [\" x \"]", () => {
+    const doc = next.from({ " x ": 0});
+
+    const newDoc = next.change(doc, (doc) => {
+      applyPatch(doc, {
+        action: "put",
+        path: [" x "],
+        value: 1,
+      });
+    });
+    expect(newDoc[" x "]).toEqual(1);
+  });
 });
