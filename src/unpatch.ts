@@ -105,8 +105,8 @@ export const unpatch = <T>(doc: Doc<T>, patch: Patch): Patch => {
   throw new Error(`Unknown patch action: ${patch.action}`);
 };
 
-export const unpatchAll = <T>(doc: Doc<T>, patches: Patch[]): Patch[] => {
-  const copy = clone(doc);
+export const unpatchAll = <T>(beforeDoc: Doc<T>, patches: Patch[]): Patch[] => {
+  const copy = clone(beforeDoc);
 
   const inverse: Patch[] = [];
 

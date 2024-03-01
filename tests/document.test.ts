@@ -71,7 +71,7 @@ describe("next Document Tests", () => {
       (doc) => {
         deleteAt(doc.values, 2);
         deleteAt(doc.values, 4);
-      }
+      },
     );
   });
 
@@ -92,7 +92,7 @@ describe("next Document Tests", () => {
       (doc) => {
         insertAt(doc.values, 0, "things");
         deleteAt(doc.values, 4);
-      }
+      },
     );
     const reverse = unpatchAll(doc, patches);
 
@@ -127,7 +127,7 @@ describe("next Document Tests", () => {
       },
       (doc) => {
         delete doc.object;
-      }
+      },
     );
 
     const unpatches = patches.map((p) => unpatch(doc, p)).reverse();

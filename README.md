@@ -71,9 +71,9 @@ let reverse: Patch[];
 const doc2 = change(
   doc,
   {
-    patchCallback: (patches, { after }) => {
+    patchCallback: (patches, { before }) => {
       // capture reverse of the patches for undo
-      reverse = unpatchAll(after, patches);
+      reverse = unpatchAll(before, patches);
     },
   },
   (doc) => {
