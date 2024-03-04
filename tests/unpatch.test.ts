@@ -240,6 +240,19 @@ describe("Un-patching patches", () => {
         value: "hello",
       },
     },
+    {
+      name: "delete bytes",
+      patch: {
+        action: "del",
+        path: ["bytes"],
+      },
+      expected: {
+        action: "put",
+        path: ["bytes"],
+        value: new Uint8Array([0, 1, 2, 3, 4, 5, 6, 7]),
+        conflict: false,
+      },
+    }
   ];
 
   tests.forEach(({ name, patch, expected }) => {

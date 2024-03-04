@@ -22,12 +22,16 @@ export function isPlainObject(arg: any): arg is Record<Prop, any> {
 
 const replacerReviver = () => {
   // we hard code a random uuid to avoid collisions
-  const uuid = "a4c5c0bf-a658-4af9-a1ad-efeb7f10c793";
+  const dateUuid = "a4c5c0bf-a658-4af9-a1ad-efeb7f10c793";
+  const bytesUuid = "7ae7efe9-84c6-4c7c-906f-0985b55c6644";
   return [
     function (this: Record<string, unknown>, k: string) {
       const v: unknown = this[k];
       if (v instanceof Date) {
-        return `${uuid}-${v.getTime()}`;
+        return `${dateUuid}-${v.getTime()}`;
+      }
+      if (isBytes(v)) {
+        return [bytesUuid, v.toString()];
       }
       if (
         typeof v === "object" &&
@@ -40,7 +44,10 @@ const replacerReviver = () => {
       return v;
     },
     (_: string, v: unknown) => {
-      if (typeof v === "string" && v.startsWith(uuid)) {
+      if (Array.isArray(v) && v[0] === bytesUuid) {
+        return new Uint8Array(v[1].split(",").map(Number));
+      }
+      if (typeof v === "string" && v.startsWith(dateUuid)) {
         return new Date(parseInt(v.slice(v.lastIndexOf("-") + 1), 10));
       }
       return v;
@@ -56,6 +63,10 @@ export function clone<T>(arg: T): T {
 
 export function isTextObject(arg: any): arg is Text {
   return arg instanceof Text;
+}
+
+export function isBytes(arg: any): arg is Uint8Array {
+  return arg instanceof Uint8Array;
 }
 
 export function getProperty<T extends Doc<T>>(
