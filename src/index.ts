@@ -1,2 +1,2 @@
-export { unpatch, unpatchAll } from "./unpatch";
+export { unpatch, unpatchAll, filterRedundantPatches } from "./unpatch";
 export { patch } from "./patch";
