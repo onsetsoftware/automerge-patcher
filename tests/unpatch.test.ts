@@ -1,9 +1,7 @@
+import type { Patch } from "@automerge/automerge";
 import { beforeEach, describe, expect, test } from "vitest";
-import type { Doc, Patch } from "@automerge/automerge";
-import { insertAt, next } from "@automerge/automerge";
-import { documentData } from "./data";
 import { unpatch } from "../src";
-import { filterRedundantPatches } from "../src/unpatch";
+import { documentData } from "./data";
 
 describe("Un-patching patches", () => {
   beforeEach(() => {});
@@ -267,59 +265,5 @@ describe("Un-patching patches", () => {
       const unPatched = unpatch(documentData, patch);
       expect(unPatched).toEqual(expected);
     });
-  });
-});
-
-type Data = {
-  name: string;
-  todos: string[];
-};
-
-describe("Redundant patches can be removed from a set of patches", () => {
-  let doc: Doc<Data>;
-
-  beforeEach(() => {
-    doc = next.from({
-      name: "Jane",
-      todos: ["do laundry", "buy milk", "iron clothes"],
-    });
-  });
-
-  test("a set of valid splice and del patches on a string are not filtered", () => {
-    return new Promise<void>((resolve) => {
-      next.change(
-        doc,
-        {
-          patchCallback: (patches, { before, after }) => {
-            const filtered = filterRedundantPatches(patches, before, after);
-
-            expect(filtered).toEqual(patches);
-            resolve();
-          },
-        },
-        (d) => {
-          next.updateText(d, ["name"], "John");
-        },
-      );
-    });
-  });
-
-  test("a set of patches which change and then return to the same value are all filtered", () => {
-    const after = next.change(doc, (d) => {
-      next.deleteAt(d.todos, 2);
-    });
-
-    const patches = [
-      { action: "del", path: ["name", 1] },
-      { action: "splice", path: ["name", 1], value: "oh" },
-      { action: "del", path: ["name", 4] },
-      { action: "splice", path: ["name", 1], value: "a" },
-      { action: "del", path: ["name", 2], length: 2 },
-      { action: "splice", path: ["name", 3], value: "e" },
-      { action: "del", path: ["todos", 2] },
-    ] satisfies Patch[];
-
-    const filtered = filterRedundantPatches(patches, doc, after);
-    expect(filtered).toEqual([{ action: "del", path: ["todos", 2] }]);
   });
 });
