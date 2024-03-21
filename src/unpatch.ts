@@ -110,7 +110,7 @@ export const unpatchAll = <T>(beforeDoc: Doc<T>, patches: Patch[]): Patch[] => {
 
   const inverse: Patch[] = [];
 
-  patches.forEach((p) => {
+  clone(patches).forEach((p) => {
     inverse.push(unpatch(copy, p));
     patch(copy, p);
   });
