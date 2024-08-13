@@ -5,7 +5,7 @@ import {
   type Doc,
   type Patch,
   isAutomerge,
-} from "@automerge/automerge";
+} from "@automerge/automerge/slim";
 
 import {
   getProperty,

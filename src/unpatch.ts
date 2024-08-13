@@ -3,7 +3,7 @@ import {
   type Patch,
   type Prop,
   type Text,
-} from "@automerge/automerge";
+} from "@automerge/automerge/slim";
 import { clone, getProperty, isTextObject } from "./helpers";
 import { patch } from "./patch";
 

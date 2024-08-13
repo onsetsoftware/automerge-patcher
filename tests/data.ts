@@ -1,4 +1,4 @@
-import { Counter, Text } from "@automerge/automerge";
+import { Counter, Text } from "@automerge/automerge/slim";
 
 export const documentData: {
   string: string;
