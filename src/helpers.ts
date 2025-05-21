@@ -1,4 +1,4 @@
-import { Doc, Prop, Text, next } from "@automerge/automerge/slim";
+import { Doc, Prop, next, isImmutableString } from "@automerge/automerge/slim";
 
 function baseIsPlainObject(arg: any): arg is Record<string, any> {
   if (arg == null || typeof arg !== "object") {
@@ -15,7 +15,7 @@ export function isPlainObject(arg: any): arg is Record<Prop, any> {
   return (
     !(arg instanceof Date) &&
     baseIsPlainObject(arg) &&
-    !isTextObject(arg) &&
+    !isImmutableString(arg) &&
     !Array.isArray(arg)
   );
 }
@@ -61,8 +61,8 @@ export function clone<T>(arg: T): T {
   return JSON.parse(JSON.stringify(arg, replacer), reviver);
 }
 
-export function isTextObject(arg: any): arg is Text {
-  return arg instanceof Text;
+export function isTextObject(arg: any): arg is string {
+  return typeof arg === "string";
 }
 
 export function isBytes(arg: any): arg is Uint8Array {

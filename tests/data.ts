@@ -1,8 +1,8 @@
-import { Counter, Text } from "@automerge/automerge/slim";
+import {Counter, ImmutableString} from "@automerge/automerge/slim";
 
 export const documentData: {
-  string: string;
-  text: Text;
+  string: ImmutableString;
+  text: string;
   counter: Counter;
   array: string[];
   date: Date;
@@ -39,8 +39,8 @@ export const documentData: {
   };
   bytes: Uint8Array;
 } = {
-  string: "hello world",
-  text: new Text("hello world"),
+  string: new ImmutableString("hello world"),
+  text: "hello world",
   counter: new Counter(0),
   array: ["hello", "world"],
   date: new Date(1692724609057),

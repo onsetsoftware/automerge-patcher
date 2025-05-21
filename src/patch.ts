@@ -1,5 +1,4 @@
 import {
-  Text,
   insertAt,
   next,
   type Doc,
@@ -10,7 +9,6 @@ import {
 import {
   getProperty,
   isPlainObject,
-  isTextObject,
   setProperty,
 } from "./helpers";
 
@@ -20,20 +18,9 @@ export function patch<T>(doc: Doc<T>, patch: Patch) {
   if (patch.action === "insert") {
     const [index, ...path] = [...patch.path].reverse();
 
-    const value = getProperty(doc, path.reverse()) as string | Text | any[];
+    const value = getProperty(doc, path.reverse()) as string | any[];
 
     if (typeof value === "string") {
-      if (automerge) {
-        setProperty(
-          doc,
-          path.reverse(),
-          new Text(
-            value.slice(0, Number(index)) +
-              patch.values.join("") +
-              value.slice(Number(index)),
-          ),
-        );
-      } else {
         setProperty(
           doc,
           path.reverse(),
@@ -41,12 +28,6 @@ export function patch<T>(doc: Doc<T>, patch: Patch) {
             patch.values.join("") +
             value.slice(Number(index)),
         );
-      }
-      return;
-    }
-
-    if (isTextObject(value)) {
-      value.insertAt(Number(index), ...patch.values);
       return;
     }
 
