@@ -1,10 +1,5 @@
-import {
-  type Doc,
-  type Patch,
-  type Prop,
-  type Text,
-} from "@automerge/automerge/slim";
-import { clone, getProperty, isTextObject } from "./helpers";
+import { type Doc, type Patch, type Prop } from "@automerge/automerge/slim";
+import { clone, getProperty } from "./helpers";
 import { patch } from "./patch";
 
 export const unpatch = <T>(doc: Doc<T>, patch: Patch): Patch => {
@@ -21,7 +16,6 @@ export const unpatch = <T>(doc: Doc<T>, patch: Patch): Patch => {
 
     const value = getProperty(doc, path.reverse(), doc) as
       | Record<Prop, any>
-      | Text
       | Array<any>
       | string;
 
@@ -35,7 +29,7 @@ export const unpatch = <T>(doc: Doc<T>, patch: Patch): Patch => {
       };
     }
 
-    if (!Array.isArray(value) && !isTextObject(value)) {
+    if (!Array.isArray(value)) {
       return {
         action: "put",
         path: patch.path,
@@ -49,9 +43,7 @@ export const unpatch = <T>(doc: Doc<T>, patch: Patch): Patch => {
     return {
       action: "insert",
       path: patch.path,
-      values: isTextObject(value)
-        ? [...Array(length)].map((_, i) => value.get(Number(index) + i))
-        : [...Array(length)].map((_, i) => clone(value[Number(index) + i])),
+      values: [...Array(length)].map((_, i) => clone(value[Number(index) + i])),
     };
   }
 
@@ -66,19 +58,6 @@ export const unpatch = <T>(doc: Doc<T>, patch: Patch): Patch => {
         value: clone(value),
       };
     } else {
-      // getProperty cannot look up the value of text on put actions,
-      // so handle that case separately here.
-      const parent = getProperty(doc, patch.path.slice(0, -1));
-      const lastPart = patch.path[patch.path.length - 1];
-      if (isTextObject(parent) && typeof lastPart === "number") {
-        return {
-          action: "put",
-          path: patch.path,
-          conflict: false,
-          value: parent.get(lastPart),
-        };
-      }
-
       return {
         action: "del",
         path: patch.path,
@@ -110,7 +89,7 @@ export const unpatchAll = <T>(beforeDoc: Doc<T>, patches: Patch[]): Patch[] => {
 
   const inverse: Patch[] = [];
 
-  clone(patches).forEach((p) => {
+  [...patches].forEach((p) => {
     inverse.push(unpatch(copy, p));
     patch(copy, p);
   });

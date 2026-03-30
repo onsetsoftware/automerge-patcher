@@ -1,4 +1,4 @@
-import { change, type Doc, from, Patch, next } from "@automerge/automerge";
+import { change, type Doc, from, init, Patch } from "@automerge/automerge";
 import { patch as applyPatch } from "../src";
 import { beforeEach, describe, expect, test } from "vitest";
 import { documentData } from "./data";
@@ -6,51 +6,13 @@ import { clone, getProperty } from "../src/helpers";
 
 describe("Applying Patches", () => {
   let doc: Doc<typeof documentData>;
-  let nextDoc: Doc<Omit<typeof documentData, "text">>;
   let plainDoc: Doc<typeof documentData>;
   beforeEach(() => {
     plainDoc = clone(documentData);
     doc = from(documentData);
-    const { text, ...withoutText } = documentData;
-    nextDoc = next.from({ ...withoutText });
   });
 
-  const stableTests: {
-    name: string;
-    patch: Patch;
-    expected: any;
-    path: string;
-  }[] = [
-    {
-      name: "insert text",
-      patch: {
-        action: "insert",
-        path: ["text", 6],
-        values: ["t", "h", "e", "r", "e", " "],
-      },
-      path: "text",
-      expected: "hello there world",
-    },
-    {
-      name: "delete text",
-      patch: {
-        action: "del",
-        path: ["text", 2],
-        length: 3,
-      },
-      path: "text",
-      expected: "he world",
-    },
-    {
-      name: "insert text",
-      patch: {
-        action: "insert",
-        path: ["emptyText", 0],
-        values: ["h", "e", "l", "l", "o"],
-      },
-      path: "emptyText",
-      expected: "hello",
-    },
+  const tests: { name: string; patch: Patch; expected: any; path: string }[] = [
     {
       name: "delete root property",
       patch: {
@@ -60,9 +22,6 @@ describe("Applying Patches", () => {
       path: "optional",
       expected: null,
     },
-  ];
-
-  const tests: { name: string; patch: Patch; expected: any; path: string }[] = [
     {
       name: "insert into array",
       patch: {
@@ -124,14 +83,6 @@ describe("Applying Patches", () => {
       path: "counter",
       expected: 5,
     },
-  ];
-
-  const nextTests: {
-    name: string;
-    patch: Patch;
-    expected: any;
-    path: string;
-  }[] = [
     {
       name: "splice insert text",
       patch: {
@@ -154,8 +105,8 @@ describe("Applying Patches", () => {
     },
   ];
 
-  [...stableTests, ...tests].forEach(({ name, patch, expected, path }) => {
-    test("Automerge stable: " + name, () => {
+  tests.forEach(({ name, patch, expected, path }) => {
+    test("Automerge: " + name, () => {
       const newDoc = change(doc, (doc) => {
         applyPatch(doc, patch);
       });
@@ -168,36 +119,18 @@ describe("Applying Patches", () => {
     });
   });
 
-  [...stableTests, ...tests, ...nextTests].forEach(
-    ({ name, patch, expected, path }) => {
-      test("JS: " + name, () => {
-        applyPatch(plainDoc, patch);
+  tests.forEach(({ name, patch, expected, path }) => {
+    test("JS: " + name, () => {
+      applyPatch(plainDoc, patch);
 
-        expect(getProperty(plainDoc, path.split(".")) || null).toEqual(
-          expected,
-        );
-      });
-    },
-  );
-
-  [...tests, ...nextTests].forEach(({ name, patch, expected, path }) => {
-    test("Automerge next: " + name, () => {
-      const newDoc = next.change(nextDoc, (doc) => {
-        applyPatch(doc, patch);
-      });
-
-      expect(
-        JSON.parse(
-          JSON.stringify(getProperty(newDoc, path.split(".")) || null),
-        ),
-      ).toEqual(expected);
+      expect(getProperty(plainDoc, path.split(".")) || null).toEqual(expected);
     });
   });
 
   test("splicing an empty string works within the same function", () => {
-    const doc = next.init<{ foo: string }>();
+    const doc = init<{ foo: string }>();
 
-    const newDoc = next.change(doc, (doc) => {
+    const newDoc = change(doc, (doc) => {
       doc.foo = "";
       applyPatch(doc, {
         action: "splice",
@@ -210,9 +143,9 @@ describe("Applying Patches", () => {
   });
 
   test('change the value of the property at path ["."]', () => {
-    const doc = next.from({ ".": 0 });
+    const doc = from({ ".": 0 });
 
-    const newDoc = next.change(doc, (doc) => {
+    const newDoc = change(doc, (doc) => {
       applyPatch(doc, {
         action: "put",
         path: ["."],
@@ -223,9 +156,9 @@ describe("Applying Patches", () => {
   });
 
   test('change the value of the property at path ["test.", ".x"]', () => {
-    const doc = next.from({ "test.": { ".x": 0 } });
+    const doc = from({ "test.": { ".x": 0 } });
 
-    const newDoc = next.change(doc, (doc) => {
+    const newDoc = change(doc, (doc) => {
       applyPatch(doc, {
         action: "put",
         path: ["test.", ".x"],
@@ -236,9 +169,9 @@ describe("Applying Patches", () => {
   });
 
   test('change the value of the property at path [" x "]', () => {
-    const doc = next.from({ " x ": 0 });
+    const doc = from({ " x ": 0 });
 
-    const newDoc = next.change(doc, (doc) => {
+    const newDoc = change(doc, (doc) => {
       applyPatch(doc, {
         action: "put",
         path: [" x "],

@@ -8,45 +8,6 @@ describe("Un-patching patches", () => {
 
   const tests: { name: string; patch: Patch; expected: Patch }[] = [
     {
-      name: "basic text insert",
-      patch: {
-        action: "insert",
-        path: ["text", 0],
-        values: ["h", "e", "l", "l", "o"],
-      },
-      expected: { action: "del", path: ["text", 0], length: 5 },
-    },
-
-    {
-      name: "basic text delete",
-      patch: {
-        action: "del",
-        path: ["text", 0],
-        length: 2,
-      },
-      expected: {
-        action: "insert",
-        path: ["text", 0],
-        values: ["h", "e"],
-      },
-    },
-
-    {
-      name: "basic text put",
-      patch: {
-        action: "put",
-        path: ["text", 0],
-        value: "b",
-      },
-      expected: {
-        action: "put",
-        path: ["text", 0],
-        value: "h",
-        conflict: false,
-      },
-    },
-
-    {
       name: "array delete",
       patch: {
         action: "del",

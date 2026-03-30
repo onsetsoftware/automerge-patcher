@@ -1,26 +1,25 @@
 import {
-  Text,
-  insertAt,
-  next,
   type Doc,
   type Patch,
+  // applyPatches,
+  insertAt,
   isAutomerge,
-} from "@automerge/automerge/slim";
-
-import {
-  getProperty,
-  isPlainObject,
-  isTextObject,
-  setProperty,
-} from "./helpers";
+  splice,
+} from "@automerge/automerge";
+import { getProperty, isPlainObject, setProperty } from "./helpers";
 
 export function patch<T>(doc: Doc<T>, patch: Patch) {
   const automerge = isAutomerge(doc);
 
+  // if (automerge) {
+  //   applyPatches(doc, [patch]);
+  //   return;
+  // }
+
   if (patch.action === "insert") {
     const [index, ...path] = [...patch.path].reverse();
 
-    const value = getProperty(doc, path.reverse()) as string | Text | any[];
+    const value = getProperty(doc, path.reverse()) as string | any[];
 
     if (typeof value === "string") {
       if (automerge) {
@@ -45,11 +44,6 @@ export function patch<T>(doc: Doc<T>, patch: Patch) {
       return;
     }
 
-    if (isTextObject(value)) {
-      value.insertAt(Number(index), ...patch.values);
-      return;
-    }
-
     if (automerge) {
       insertAt(value, Number(index), ...patch.values);
     } else {
@@ -65,7 +59,7 @@ export function patch<T>(doc: Doc<T>, patch: Patch) {
 
     if (typeof value === "string") {
       if (automerge) {
-        next.splice(doc, path, index as number, patch.length || 1);
+        splice(doc, path, index as number, patch.length || 1);
       } else {
         setProperty(
           doc,
@@ -111,7 +105,7 @@ export function patch<T>(doc: Doc<T>, patch: Patch) {
   if (patch.action === "splice") {
     const [index, ...path] = [...patch.path].reverse();
     if (automerge) {
-      next.splice(doc, path.reverse(), index as number, 0, patch.value);
+      splice(doc, path.reverse(), index as number, 0, patch.value);
     } else {
       const value: any = getProperty(doc, path.reverse());
 
