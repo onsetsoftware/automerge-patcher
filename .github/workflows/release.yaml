@@ -5,6 +5,10 @@ on:
       - main
       - next
 
+permissions:
+  id-token: write  # Required for OIDC
+  contents: read
+
 jobs:
   check_if_version_upgraded:
     name: Check if package version has been upgraded
