@@ -11,6 +11,7 @@ import { getProperty, isPlainObject, setProperty } from "./helpers";
 export function patch<T>(doc: Doc<T>, patch: Patch) {
   const automerge = isAutomerge(doc);
 
+  // the 1st party applyPatches doesn't support delete patches just yet
   // if (automerge) {
   //   applyPatches(doc, [patch]);
   //   return;

@@ -1,4 +1,4 @@
-import { Doc, Prop, next } from "@automerge/automerge/slim";
+import { Doc, Prop } from "@automerge/automerge/slim";
 
 function baseIsPlainObject(arg: any): arg is Record<string, any> {
   if (arg == null || typeof arg !== "object") {
@@ -93,14 +93,4 @@ export function setProperty<T extends object>(
   }
 
   return doc;
-}
-
-// this is a hack for now, but will look to introduce a 1st party function in automerge
-export function isNext(doc: Doc<unknown>) {
-  try {
-    next.getConflicts(doc, "");
-  } catch (e) {
-    return false;
-  }
-  return true;
 }
