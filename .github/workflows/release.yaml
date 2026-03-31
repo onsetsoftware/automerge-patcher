@@ -58,7 +58,7 @@ jobs:
       - name: Create npm release
         if: steps.tests.outcome == 'success'
         run: |
-          EXTRA_ARGS="--access public"
+          EXTRA_ARGS="--access public --provenance"
           if [[ $VERSION == *"alpha."* ]] || [[ $VERSION == *"beta."* ]] || [[ $VERSION == *"rc."* ]]; then
             echo "Is pre-release version"
             EXTRA_ARGS="$EXTRA_ARGS --tag next"
